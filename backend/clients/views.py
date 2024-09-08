@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework import permissions
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from main.models import Client, Specialist, Slot
@@ -42,10 +42,11 @@ class SlotView(RetrieveAPIView):
     permission_classes = [ClientPermission]
 
 @api_view(["POST",])
+@permission_classes([ClientPermission])
 def sign_to_slot(request, slot):
     if request.method == "POST":
         user = request.user
-        if not user or not user.is_authenticated:
+        if not user or not user.is_authenticated or not user.is_active:
             return Response({
                 "status": 403,
                 "error": "User is not authenticated"

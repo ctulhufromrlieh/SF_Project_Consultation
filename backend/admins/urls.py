@@ -18,21 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.schemas import get_schema_view
 
-from main.views import *
+from admins.views import *
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("api/v1/accounts/", include("accounts.urls")),   
-
-    path("api/v1/clients/", include("clients.urls")),   
-    path("api/v1/admins/", include("admins.urls")),   
-
-    # path('api/v1/clients/', ClientView.as_view(), name='api_clients'),
-    # path('api/v1/specialists/', SpecialistView.as_view(), name='api_specialists'),
-    # path('api/v1/slots/', SlotView.as_view(), name='api_slots'),
-
-    path('openapi', get_schema_view(
-        title="Silant",
-        description="API for Silant"
-    ), name='openapi-schema'),
+    path('users', UserListView.as_view(), name='api_admins_user_list'),
+    path('users/<int:pk>', UserView.as_view(), name='api_admins_user_one'),
+    path('clients', ClientListView.as_view(), name='api_admins_client_list'),
+    path('clients/<int:pk>', ClientView.as_view(), name='api_admins_client_one'),
+    path('specialists', SpecialistListView.as_view(), name='api_admins_specialist_list'),
+    path('specialists/<int:pk>', SpecialistView.as_view(), name='api_admins_specialist_one'),
+    path('user_activate/<int:user>', user_activate, name='api_admins_user_activate'),
+    path('user_deactivate/<int:user>', user_deactivate, name='api_admins_user_deactivate'),
 ]

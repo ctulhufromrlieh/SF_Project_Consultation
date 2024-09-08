@@ -3,6 +3,21 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+# class MyUser(User):
+#     pass
+
+class ConsultType(models.Model):
+    name = models.CharField(max_length=255, unique=True, help_text="Consult type name")
+
+    def __str__(self):
+        return self.name
+
+class CancelType(models.Model):
+    name = models.CharField(max_length=255, unique=True, help_text="Cancel type name")
+
+    def __str__(self):
+        return self.name
+
 class Client(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="client")
     name = models.CharField(max_length=255, unique=True, help_text="Client name")
