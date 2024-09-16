@@ -16,23 +16,30 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
 from rest_framework.schemas import get_schema_view
+from rest_framework_swagger.views import get_swagger_view
 
 from main.views import *
+
+schema_view = get_swagger_view(title='Pastebin API')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/accounts/", include("accounts.urls")),   
 
-    path("api/v1/clients/", include("clients.urls")),   
-    path("api/v1/admins/", include("admins.urls")),   
+    path("api/v1/for_clients/", include("clients.urls")),   
+    path("api/v1/for_specialists/", include("specialists.urls")),   
+    path("api/v1/for_admins/", include("admins.urls")),   
 
     # path('api/v1/clients/', ClientView.as_view(), name='api_clients'),
     # path('api/v1/specialists/', SpecialistView.as_view(), name='api_specialists'),
     # path('api/v1/slots/', SlotView.as_view(), name='api_slots'),
 
     path('openapi', get_schema_view(
-        title="Silant",
-        description="API for Silant"
+        title="Consultation",
+        description="API for Consultation"
     ), name='openapi-schema'),
+
+    path('swagger', schema_view)
 ]

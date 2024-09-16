@@ -8,21 +8,21 @@ from .utils import *
 #     else:
 #         return def_value
 
-def get_slot_queryset(request):
-    user = request.user
+# def get_slot_queryset(request):
+#     user = request.user
 
-    specialist_id = -1
-    if Specialist.is_own(user):
-        specialist_id = user.specialist.id
-    else:
-        specialist_id = to_int(request.GET.get('specialist', ''), -1)
+#     specialist_id = -1
+#     if Specialist.is_own(user):
+#         specialist_id = user.specialist.id
+#     else:
+#         specialist_id = to_int(request.GET.get('specialist', ''), -1)
 
-    print("specialist=", specialist_id)
+#     print("specialist=", specialist_id)
 
-    if specialist_id == -1:
-        return Slot.objects.none()
-    else:
-        return Slot.objects.all().filter(specialist=specialist_id)
+#     if specialist_id == -1:
+#         return Slot.objects.none()
+#     else:
+#         return Slot.objects.all().filter(specialist=specialist_id)
 
 # def get_simple_car_queryset(request, use_filter):
 #     res = Car.objects.all()

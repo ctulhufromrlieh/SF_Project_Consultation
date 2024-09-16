@@ -18,8 +18,9 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.schemas import get_schema_view
 
-from main.views import *
+from .views import *
 
 urlpatterns = [
-    
+    path('slots', SlotListView.as_view(), name='api_specialists_slot_list'),
+    path('slots/<int:pk>', SlotView.as_view(), name='api_specialists_slot_one'),
 ]

@@ -2,7 +2,7 @@ from rest_framework import permissions
 
 from main.models import Specialist
 
-class ClientPermission(permissions.BasePermission):
+class SpecialistPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if Specialist.is_own(request.user):

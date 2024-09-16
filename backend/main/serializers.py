@@ -20,6 +20,12 @@ class SlotSerializer(serializers.ModelSerializer):
         fields = ('id', 'client', 'client__name', 'specialist', 'specialist__name', 
                   'title', 'datetime1', 'datetime2', 'description'
                  )
+        
+class SlotUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Slot
+        fields = ('title', 'datetime1', 'datetime2', 'description'
+                 )
 
 # class ServiceCompanySerializer(serializers.ModelSerializer):
 #     class Meta:

@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 # Groups
 group_clients, created = Group.objects.get_or_create(name="clients")
 group_specialists, created = Group.objects.get_or_create(name="specialists")
+group_admins, created = Group.objects.get_or_create(name="admins")
 
 User.objects.exclude(username="admin").delete()
 
@@ -14,21 +15,39 @@ Client.objects.all().delete()
 client1 = create_client(name='Вася Пупкин', username="client1", email="client1@clients.aa", password="client1psw")
 client2 = create_client(name='Иван Петров', username="client2", email="client2@clients.bb", password="client2psw")
 
-
 # Specialists
 Specialist.objects.all().delete()
 
 spec1 = create_specialist(name="Проффффессор", username="spec1", email="spec1@specialists.aa", password="spec1psw")
 spec2 = create_specialist(name="Доцент", username="spec2", email="spec2@specialists.bb", password="spec2psw")
 
+# Admins
+Admin.objects.all().delete()
+
+admin1 = create_admin(name="ГлавАдмин", username="admin1", email="admin1@admins.aa", password="admin11psw")
+admin2 = create_admin(name="Почти главный админ", username="admin2", email="admin2@admins.bb", password="admin2psw")
+
+# ConsultType
+ConsultType.objects.all().delete()
+
+cot1 = ConsultType.objects.create(name="Математика")
+cot2 = ConsultType.objects.create(name="Физика")
+
+# CancelType
+CancelType.objects.all().delete()
+
+cat1 = CancelType.objects.create(name="Другая")
+cat2 = CancelType.objects.create(name="Передумал")
+cat3 = CancelType.objects.create(name="Забыл")
+
 # Slots
 Slot.objects.all().delete()
 
-slot1 = Slot.objects.create(client=client1, specialist=spec1, title="Проффффессор - Вася Пупкин", 
-    datetime1="2024-01-10 10:00", datetime2="2024-01-10 12:00", description="Консультация: Проффффессор - Вася Пупкин")
-slot2 = Slot.objects.create(client=client2, specialist=spec1, title="Проффффессор - Иван Петров", 
-    datetime1="2024-01-10 12:00", datetime2="2024-01-10 14:00", description="Консультация: Проффффессор - Иван Петров")
-slot3 = Slot.objects.create(client=client1, specialist=spec2, title="Доцент - Вася Пупкин", 
-    datetime1="2024-01-11 10:00", datetime2="2024-01-11 12:00", description="Консультация: Доцент - Вася Пупкин")
-slot4 = Slot.objects.create(client=client2, specialist=spec2, title="Доцент - Иван Петров", 
-    datetime1="2024-01-11 12:00", datetime2="2024-01-11 14:00", description="Консультация: Доцент - Иван Петров")
+slot1 = Slot.objects.create(client=client1, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
+    datetime1="2024-01-10 10:00", datetime2="2024-01-10 12:00", description="Консультация: Проффффессор - Математика")
+slot2 = Slot.objects.create(client=client2, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
+    datetime1="2024-01-10 12:00", datetime2="2024-01-10 14:00", description="Консультация: Проффффессор - Математика")
+slot3 = Slot.objects.create(client=client1, specialist=spec2, type=cot2, title="Доцент - Физика", 
+    datetime1="2024-01-11 10:00", datetime2="2024-01-11 12:00", description="Консультация: Доцент - Физика")
+slot4 = Slot.objects.create(client=client2, specialist=spec2, type=cot2, title="Доцент - Физика", 
+    datetime1="2024-01-11 12:00", datetime2="2024-01-11 14:00", description="Консультация: Доцент - Физика")

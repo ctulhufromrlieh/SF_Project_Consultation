@@ -5,7 +5,7 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from main.models import Client, Specialist, Slot
+from main.models import Client, Specialist, Slot, SlotStatusTypes
 from main.serializers import SpecialistSerializer, SlotSerializer
 from main.utils import to_int, is_datetimes_intersect
 from .querysets import get_slot_queryset
@@ -46,17 +46,17 @@ class SlotView(RetrieveAPIView):
 def sign_to_slot(request, slot):
     if request.method == "POST":
         user = request.user
-        if not user or not user.is_authenticated or not user.is_active:
-            return Response({
-                "status": 403,
-                "error": "User is not authenticated"
-                })
+        # if not user or not user.is_authenticated or not user.is_active:
+        #     return Response({
+        #         "status": 403,
+        #         "error": "User is not authenticated"
+        #         })
 
-        if not Client.is_own(user):
-            return Response({
-                "status": 403,
-                "error": "User is not permited"
-                })
+        # if not Client.is_own(user):
+        #     return Response({
+        #         "status": 403,
+        #         "error": "User is not permited"
+        #         })
         
         # slot_param = request.POST.get("slot", "")
         # slot_param = slot
@@ -105,7 +105,59 @@ def sign_to_slot(request, slot):
         slot_obj.save()
         return Response({
             "status": 200,
-            "success": "Client successfully signed to slot"
+            "success": "You successfully signed to slot"
+            })
+
+@api_view(["POST",])
+@permission_classes([ClientPermission])
+def unsign_from_slot(request, slot):
+    if request.method == "POST":
+        user = request.user
+        # if not user or not user.is_authenticated or not user.is_active:
+        #     return Response({
+        #         "status": 403,
+        #         "error": "User is not authenticated"
+        #         })
+
+        # if not Client.is_own(user):
+        #     return Response({
+        #         "status": 403,
+        #         "error": "User is not permited"
+        #         })
+        
+        # slot_param = request.POST.get("slot", "")
+        # slot_param = slot
+        # slot_id = to_int(slot_param, -1)
+        if slot:
+            slot_id=slot
+        else:
+            slot_id=-1
+        if slot_id == -1:
+            return Response({
+                "status": 400,
+                "error": "Slot id not defined"
+                })
+        
+        slot_obj = Slot.objects.filter(id=slot_id).first()
+        if not slot_obj:
+            return Response({
+                "status": 400,
+                "error": "Slot with such id not exists"
+                })
+        
+        if not slot_obj.client == user.client:
+            return Response({
+                "status": 400,
+                "error": "You are not signed to this slot"
+                })
+            
+        slot_obj.client = None
+        slot_obj.status = SlotStatusTypes.SLOT_STATUS_CANCELED
+        slot_obj.save()
+
+        return Response({
+            "status": 200,
+            "success": "You successfully unsigned from slot"
             })
 
 # class SlotSetSelfClientView(UpdateAPIView):
