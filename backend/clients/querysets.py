@@ -16,13 +16,17 @@ def get_slot_queryset(request, is_only_available=True):
     # else:
     #     specialist_id = to_int(request.GET.get('specialist', ''), -1)
 
-    print("specialist=", specialist_id)
+    # print("specialist=", specialist_id)
 
     res = Slot.objects.all()
+
+    # print(f"res.count()={res.count()}")
 
     if not (specialist_id == -1):
         res = res.filter(specialist=specialist_id)
     if is_only_available:
         res = res.filter(client=None)
+
+    # print(f"res.count()={res.count()}")
 
     return res

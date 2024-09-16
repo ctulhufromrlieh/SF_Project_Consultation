@@ -35,7 +35,10 @@ class BaseTest(APITestCase):
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status_code)
-        self.assertEqual(json_response[response_field_name], response_field_text)
+        if response_field_name:
+            self.assertEqual(json_response[response_field_name], response_field_text)
+        # print("json_response:")
+        # print(json_response)
 
     def check_post_simple(self, loc_url, status_code, response_field_name, response_field_text):
         url = self.base_url + loc_url
@@ -45,17 +48,18 @@ class BaseTest(APITestCase):
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status_code)
-        self.assertEqual(json_response[response_field_name], response_field_text)
+        if response_field_name:
+            self.assertEqual(json_response[response_field_name], response_field_text)
 
 class AnonymousBaseTest(BaseTest):
     status_code = 403
     response_field_name = "detail"
     response_field_text = "Authentication credentials were not provided."
 
-    def check_get_forbidden(self, loc_url):
+    def check_get_status(self, loc_url):
         self.check_get_simple(loc_url, self.status_code, self.response_field_name, self.response_field_text)
 
-    def check_post_forbidden(self, loc_url):
+    def check_post_status(self, loc_url):
         self.check_post_simple(loc_url, self.status_code, self.response_field_name, self.response_field_text)
 
 class ForbiddenBaseTest(BaseTest):
@@ -66,15 +70,40 @@ class ForbiddenBaseTest(BaseTest):
     username = ""
     password = ""
 
-    def check_get_forbidden(self, loc_url):
+    def check_get_status(self, loc_url):
         self.check_get_simple(loc_url, self.status_code, self.response_field_name, self.response_field_text)
 
-    def check_post_forbidden(self, loc_url):
+    def check_post_status(self, loc_url):
         self.check_post_simple(loc_url, self.status_code, self.response_field_name, self.response_field_text)
 
     def setUp(self) -> None:
         super().setUp()
         create_example_database_only_users_1()
+
+        self.login(self.username, self.password)
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        self.logout()
+
+class SuccessBaseTest(BaseTest):
+    status_code = 200
+    response_field_name = ""
+    response_field_text = ""
+
+    username = ""
+    password = ""
+
+    def check_get_status(self, loc_url):
+        self.check_get_simple(loc_url, self.status_code, self.response_field_name, self.response_field_text)
+
+    def check_post_status(self, loc_url):
+        self.check_post_simple(loc_url, self.status_code, self.response_field_name, self.response_field_text)
+
+    def setUp(self) -> None:
+        super().setUp()
+        # create_example_database_only_users_1()
+        create_example_database_1()
 
         self.login(self.username, self.password)
 
@@ -138,10 +167,14 @@ def create_example_database_1():
     Slot.objects.all().delete()
 
     slot1 = Slot.objects.create(client=client1, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
-        datetime1="2024-01-10 10:00", datetime2="2024-01-10 12:00", description="Консультация: Проффффессор - Математика")
+        datetime1="2024-01-10 10:00 +03:00", datetime2="2024-01-10 12:00 +03:00", description="Консультация: Проффффессор - Математика")
     slot2 = Slot.objects.create(client=client2, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
-        datetime1="2024-01-10 12:00", datetime2="2024-01-10 14:00", description="Консультация: Проффффессор - Математика")
-    slot3 = Slot.objects.create(client=client1, specialist=spec2, type=cot2, title="Доцент - Физика", 
-        datetime1="2024-01-11 10:00", datetime2="2024-01-11 12:00", description="Консультация: Доцент - Физика")
-    slot4 = Slot.objects.create(client=client2, specialist=spec2, type=cot2, title="Доцент - Физика", 
-        datetime1="2024-01-11 12:00", datetime2="2024-01-11 14:00", description="Консультация: Доцент - Физика")
+        datetime1="2024-01-10 12:00 +03:00", datetime2="2024-01-10 14:00 +03:00", description="Консультация: Проффффессор - Математика")
+    slot3 = Slot.objects.create(client=None, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
+        datetime1="2024-01-10 14:00 +03:00", datetime2="2024-01-10 16:00 +03:00", description="Консультация: Проффффессор - Математика")
+    slot4 = Slot.objects.create(client=client1, specialist=spec2, type=cot2, title="Доцент - Физика", 
+        datetime1="2024-01-11 10:00 +03:00", datetime2="2024-01-11 12:00 +03:00", description="Консультация: Доцент - Физика")
+    slot5 = Slot.objects.create(client=client2, specialist=spec2, type=cot2, title="Доцент - Физика", 
+        datetime1="2024-01-11 12:00 +03:00", datetime2="2024-01-11 14:00 +03:00", description="Консультация: Доцент - Физика")
+    slot6 = Slot.objects.create(client=None, specialist=spec2, type=cot2, title="Доцент - Физика", 
+        datetime1="2024-01-11 14:00 +03:00", datetime2="2024-01-11 16:00 +03:00", description="Консультация: Доцент - Физика")

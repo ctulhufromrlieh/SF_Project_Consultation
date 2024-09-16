@@ -18,24 +18,43 @@ class TestsMixin():
     def tearDown(self) -> None:
         super().tearDown()
 
+    # # remove "a" for separate tests
+    # def atest_specialist_list(self):
+    #     self.check_get_simple("/specialists", self.status_code, self.response_field_name, self.response_field_text)
+    
+    # def atest_specialist_one_1(self):
+    #     self.check_get_simple("/specialists/1", self.status_code, self.response_field_name, self.response_field_text)
+
+    # def atest_slot_list(self):
+    #     self.check_get_simple("/slots", self.status_code, self.response_field_name, self.response_field_text)
+
+    # def atest_slot_one_1(self):
+    #     self.check_get_simple("/slots/3", self.status_code, self.response_field_name, self.response_field_text)
+
+    # def atest_slot_sign_1(self):
+    #     self.check_post_simple("/slots/sign/1", self.status_code, self.response_field_name, self.response_field_text)
+
+    # def atest_slot_unsign_1(self):
+    #     self.check_post_simple("/slots/unsign/1", self.status_code, self.response_field_name, self.response_field_text)
+
     # remove "a" for separate tests
     def atest_specialist_list(self):
-        self.check_get_simple("/specialists", 403, self.response_field_name, self.response_field_text)
+        self.check_get_status("/specialists")
     
     def atest_specialist_one_1(self):
-        self.check_get_simple("/specialists/1", 403, self.response_field_name, self.response_field_text)
+        self.check_get_status("/specialists/1")
 
     def atest_slot_list(self):
-        self.check_get_simple("/slots", 403, self.response_field_name, self.response_field_text)
+        self.check_get_status("/slots")
 
     def atest_slot_one_1(self):
-        self.check_get_simple("/slots/1", 403, self.response_field_name, self.response_field_text)
+        self.check_get_status("/slots/3")
 
     def atest_slot_sign_1(self):
-        self.check_post_simple("/slots/sign/1", 403, self.response_field_name, self.response_field_text)
+        self.check_post_status("/slots/sign/1")
 
     def atest_slot_unsign_1(self):
-        self.check_post_simple("/slots/unsign/1", 403, self.response_field_name, self.response_field_text)
+        self.check_post_status("/slots/unsign/1")
 
     def test_all(self):
         self.atest_specialist_list()
@@ -48,7 +67,7 @@ class TestsMixin():
 class AnonymousTests(TestsMixin, AnonymousBaseTest):
     base_url = "/api/v1/for_clients"
 
-class ClientTests(TestsMixin, ForbiddenBaseTest):
+class ClientTests(TestsMixin, SuccessBaseTest):
     base_url = "/api/v1/for_clients"
 
     username = "client1"
