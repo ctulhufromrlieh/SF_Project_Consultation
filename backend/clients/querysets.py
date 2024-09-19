@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from main.models import *    
 
 def to_int(str_value, def_value):
@@ -8,24 +10,17 @@ def to_int(str_value, def_value):
 
 def get_slot_queryset(request, is_only_available=True):
     user = request.user
+    client = user.client
 
     specialist_id = to_int(request.GET.get('specialist', ''), -1)
-    # specialist_id = -1    
-    # if Specialist.is_own(user):
-    #     specialist_id = user.specialist.id
-    # else:
-    #     specialist_id = to_int(request.GET.get('specialist', ''), -1)
-
-    # print("specialist=", specialist_id)
 
     res = Slot.objects.all()
-
-    # print(f"res.count()={res.count()}")
 
     if not (specialist_id == -1):
         res = res.filter(specialist=specialist_id)
     if is_only_available:
-        res = res.filter(client=None)
+        # res = res.filter(client=None)
+        res = res.filter(Q(client=None) | Q(client=client))
 
     # print(f"res.count()={res.count()}")
 

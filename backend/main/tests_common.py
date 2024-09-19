@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from main.models import *
 from main.debug_helpers import *
@@ -26,7 +27,89 @@ class BaseTest(APITestCase):
             }
         else:
             return None
-        
+
+    @staticmethod
+    def is_clients_equal(obj, dict):
+        return (
+            (obj.pk == dict["id"]) and
+            (obj.name == dict["name"])
+        )
+
+    @staticmethod
+    def is_specialists_equal(obj, dict):
+        return (
+            (obj.pk == dict["id"]) and
+            (obj.name == dict["name"])
+        )
+
+    @staticmethod
+    def is_admins_equal(obj, dict):
+        return (
+            (obj.pk == dict["id"]) and
+            (obj.name == dict["name"])
+        )
+    
+    @staticmethod
+    def is_slots_equal(obj, dict):
+        if obj.client:
+            client_id = obj.client.pk
+        else:
+            # client_id = -1
+            client_id = None
+
+        if obj.specialist:
+            specialist_id = obj.specialist.pk
+        else:
+            # specialist_id = -1
+            specialist_id = None
+
+        if obj.type:
+            type_id = obj.type.pk
+        else:
+            # type_id = -1
+            type_id = None
+
+        if obj.cancel_type:
+            cancel_type_id = obj.cancel_type.pk
+        else:
+            # cancel_type_id = -1
+            cancel_type_id = None
+
+        dict_datetime1 = datetime.strptime(f"{dict['datetime1']} +00:00", "%Y-%m-%d %H:%M:%S %z")
+        dict_datetime2 = datetime.strptime(f"{dict['datetime2']} +00:00", "%Y-%m-%d %H:%M:%S %z")
+
+        # print(dict)
+
+        # print(f'obj.pk == dict["id"]=>{obj.pk} == {dict["id"]}=>{obj.pk == dict["id"]}')
+        # print(f'client_id == dict["client"]=>{client_id} == {dict["client"]}=>{client_id == dict["client"]}')
+        # print(f'specialist_id == dict["specialist"]=>{specialist_id} == {dict["specialist"]}=>{specialist_id == dict["specialist"]}')
+        # print(f'type_id == dict["type"]=>{type_id} == {dict["type"]}=>{type_id == dict["type"]}')
+        # print(f'obj.title == dict["title"]=>{obj.title} == {dict["title"]}=>{obj.title == dict["title"]}')
+        # print(f'obj.datetime1==dict_datetime1=>{obj.datetime1}=={dict_datetime1}=>{obj.datetime1==dict_datetime1}')
+        # print(f'obj.datetime2==dict_datetime2=>{obj.datetime2}=={dict_datetime2}=>{obj.datetime2==dict_datetime2}')
+        # print(f'obj.description==dict["description"]=>{obj.description}=={dict["description"]}=>{obj.description==dict["description"]}')
+        # print(f'obj.cost==dict["cost"]=>{obj.cost}=={dict["cost"]}=>{obj.cost==dict["cost"]}')
+        # print(f'obj.status==dict["status"]=>{obj.status}=={dict["status"]}=>{obj.status==dict["status"]}')
+        # print(f'cancel_type_id==dict["cancel_type"]=>{cancel_type_id}=={dict["cancel_type"]}=>{cancel_type_id==dict["cancel_type"]}')
+        # print(f'obj.cancel_comment==dict["cancel_comment"]=>{obj.cancel_comment}=={dict["cancel_comment"]}=>{obj.cancel_comment==dict["cancel_comment"]}')
+
+        return (
+            (obj.pk == dict["id"]) and
+            (client_id == dict["client"]) and
+            (specialist_id == dict["specialist"]) and
+            (type_id == dict["type"]) and
+            (obj.title == dict["title"]) and
+            (obj.datetime1 == dict_datetime1) and
+            (obj.datetime2 == dict_datetime2) and
+            # (obj.datetime1 == dict["datetime1"]) and
+            # (obj.datetime2 == dict["datetime2"]) and
+            (obj.description == dict["description"]) and
+            (obj.cost == dict["cost"]) and
+            (obj.status == dict["status"]) and
+            (cancel_type_id == dict["cancel_type"]) and
+            (obj.cancel_comment == dict["cancel_comment"])
+        )
+
     def check_get_simple(self, loc_url, status_code, response_field_name, response_field_text):
         url = self.base_url + loc_url
         headers = self.get_headers()
@@ -50,6 +133,18 @@ class BaseTest(APITestCase):
         self.assertEqual(response.status_code, status_code)
         if response_field_name:
             self.assertEqual(json_response[response_field_name], response_field_text)
+
+    def get_simple(self, loc_url):
+        url = self.base_url + loc_url
+        headers = self.get_headers()
+        data = {}
+        response = self.client.get(url, data, headers=headers, format='json')
+        json_response = json.loads(response.content)
+
+        return {
+            'status_code': response.status_code,
+            'data':  json_response
+        }
 
 class AnonymousBaseTest(BaseTest):
     status_code = 403
@@ -167,14 +262,14 @@ def create_example_database_1():
     Slot.objects.all().delete()
 
     slot1 = Slot.objects.create(client=client1, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
-        datetime1="2024-01-10 10:00 +03:00", datetime2="2024-01-10 12:00 +03:00", description="Консультация: Проффффессор - Математика")
+        datetime1="2024-01-10 10:00+03:00", datetime2="2024-01-10 12:00 +03:00", description="Консультация: Проффффессор - Математика")
     slot2 = Slot.objects.create(client=client2, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
-        datetime1="2024-01-10 12:00 +03:00", datetime2="2024-01-10 14:00 +03:00", description="Консультация: Проффффессор - Математика")
+        datetime1="2024-01-10 12:00+03:00", datetime2="2024-01-10 14:00 +03:00", description="Консультация: Проффффессор - Математика")
     slot3 = Slot.objects.create(client=None, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
-        datetime1="2024-01-10 14:00 +03:00", datetime2="2024-01-10 16:00 +03:00", description="Консультация: Проффффессор - Математика")
+        datetime1="2024-01-10 14:00+03:00", datetime2="2024-01-10 16:00 +03:00", description="Консультация: Проффффессор - Математика")
     slot4 = Slot.objects.create(client=client1, specialist=spec2, type=cot2, title="Доцент - Физика", 
-        datetime1="2024-01-11 10:00 +03:00", datetime2="2024-01-11 12:00 +03:00", description="Консультация: Доцент - Физика")
+        datetime1="2024-01-11 10:00+03:00", datetime2="2024-01-11 12:00 +03:00", description="Консультация: Доцент - Физика")
     slot5 = Slot.objects.create(client=client2, specialist=spec2, type=cot2, title="Доцент - Физика", 
-        datetime1="2024-01-11 12:00 +03:00", datetime2="2024-01-11 14:00 +03:00", description="Консультация: Доцент - Физика")
+        datetime1="2024-01-11 12:00+03:00", datetime2="2024-01-11 14:00 +03:00", description="Консультация: Доцент - Физика")
     slot6 = Slot.objects.create(client=None, specialist=spec2, type=cot2, title="Доцент - Физика", 
-        datetime1="2024-01-11 14:00 +03:00", datetime2="2024-01-11 16:00 +03:00", description="Консультация: Доцент - Физика")
+        datetime1="2024-01-11 14:00+03:00", datetime2="2024-01-11 16:00 +03:00", description="Консультация: Доцент - Физика")

@@ -46,7 +46,8 @@ class Specialist(models.Model):
     @staticmethod
     def is_own(user):
         return user.groups.filter(name='specialists').exists()
-    
+   
+
 class Admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin")
     name = models.CharField(max_length=255, unique=True, help_text="Admin name")
@@ -57,6 +58,7 @@ class Admin(models.Model):
     @staticmethod
     def is_own(user):
         return user.groups.filter(name='admins').exists()
+    
 
 class Slot(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, default=None)

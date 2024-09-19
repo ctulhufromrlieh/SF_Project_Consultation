@@ -43,11 +43,24 @@ cat3 = CancelType.objects.create(name="Забыл")
 # Slots
 Slot.objects.all().delete()
 
+# slot1 = Slot.objects.create(client=client1, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
+#     datetime1="2024-01-10 10:00 +03:00", datetime2="2024-01-10 12:00 +00:00", description="Консультация: Проффффессор - Математика")
+# slot2 = Slot.objects.create(client=client2, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
+#     datetime1="2024-01-10 12:00 +03:00", datetime2="2024-01-10 14:00 +00:00", description="Консультация: Проффффессор - Математика")
+# slot3 = Slot.objects.create(client=client1, specialist=spec2, type=cot2, title="Доцент - Физика", 
+#     datetime1="2024-01-11 10:00 +03:00", datetime2="2024-01-11 12:00 +00:00", description="Консультация: Доцент - Физика")
+# slot4 = Slot.objects.create(client=client2, specialist=spec2, type=cot2, title="Доцент - Физика", 
+#     datetime1="2024-01-11 12:00 +03:00", datetime2="2024-01-11 14:00 +00:00", description="Консультация: Доцент - Физика")
+
 slot1 = Slot.objects.create(client=client1, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
-    datetime1="2024-01-10 10:00 +03:00", datetime2="2024-01-10 12:00 +03:00", description="Консультация: Проффффессор - Математика")
+    datetime1="2024-01-10 10:00+03:00", datetime2="2024-01-10 12:00 +03:00", description="Консультация: Проффффессор - Математика")
 slot2 = Slot.objects.create(client=client2, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
-    datetime1="2024-01-10 12:00 +03:00", datetime2="2024-01-10 14:00 +03:00", description="Консультация: Проффффессор - Математика")
-slot3 = Slot.objects.create(client=client1, specialist=spec2, type=cot2, title="Доцент - Физика", 
-    datetime1="2024-01-11 10:00 +03:00", datetime2="2024-01-11 12:00 +03:00", description="Консультация: Доцент - Физика")
-slot4 = Slot.objects.create(client=client2, specialist=spec2, type=cot2, title="Доцент - Физика", 
-    datetime1="2024-01-11 12:00 +03:00", datetime2="2024-01-11 14:00 +03:00", description="Консультация: Доцент - Физика")
+    datetime1="2024-01-10 12:00+03:00", datetime2="2024-01-10 14:00 +03:00", description="Консультация: Проффффессор - Математика")
+slot3 = Slot.objects.create(client=None, specialist=spec1, type=cot1, title="Проффффессор - Математика", 
+    datetime1="2024-01-10 14:00+03:00", datetime2="2024-01-10 16:00 +03:00", description="Консультация: Проффффессор - Математика")
+slot4 = Slot.objects.create(client=client1, specialist=spec2, type=cot2, title="Доцент - Физика", 
+    datetime1="2024-01-11 10:00+03:00", datetime2="2024-01-11 12:00 +03:00", description="Консультация: Доцент - Физика")
+slot5 = Slot.objects.create(client=client2, specialist=spec2, type=cot2, title="Доцент - Физика", 
+    datetime1="2024-01-11 12:00+03:00", datetime2="2024-01-11 14:00 +03:00", description="Консультация: Доцент - Физика")
+slot6 = Slot.objects.create(client=None, specialist=spec2, type=cot2, title="Доцент - Физика", 
+    datetime1="2024-01-11 14:00+03:00", datetime2="2024-01-11 16:00 +03:00", description="Консультация: Доцент - Физика")

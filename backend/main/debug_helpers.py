@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Group, User, Permission
 
-from .models import Client, Specialist
+from .models import Client, Specialist, Admin
 
 def create_client(name, username, email, password):
     user = User.objects.create_user(username=username, password=password, email=email)
@@ -26,7 +26,7 @@ def create_admin(name, username, email, password):
     admins_group = Group.objects.get(name='admins')
     user.groups.add(admins_group)
 
-    return Specialist.objects.create(name=name, user=user)
+    return Admin.objects.create(name=name, user=user)
 
 # def create_client(name, username, email, password):
 #     # user = User.objects.create(username=username, password=password, email=email)
