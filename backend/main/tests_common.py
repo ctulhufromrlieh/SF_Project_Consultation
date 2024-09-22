@@ -110,11 +110,12 @@ class BaseTest(APITestCase):
             (obj.cancel_comment == dict["cancel_comment"])
         )
 
-    def check_get_simple(self, loc_url, status_code, response_field_name, response_field_text):
+    def check_get_simple(self, loc_url, status_code, response_field_name, response_field_text, data={}):
         url = self.base_url + loc_url
         headers = self.get_headers()
         data = {}
-        response = self.client.get(url, data, headers=headers, format='json')
+        # response = self.client.get(url, data, headers=headers, format='json')
+        response = self.client.get(url, data, headers=headers)
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status_code)
@@ -123,22 +124,43 @@ class BaseTest(APITestCase):
         # print("json_response:")
         # print(json_response)
 
-    def check_post_simple(self, loc_url, status_code, response_field_name, response_field_text):
+    def check_post_simple(self, loc_url, status_code, response_field_name, response_field_text, data={}):
         url = self.base_url + loc_url
         headers = self.get_headers()
-        data = {}
-        response = self.client.post(url, data, headers=headers, format='json')
-        json_response = json.loads(response.content)
+        # data = {}
+        # print(data)
+        
+        # response = self.client.post(url, data, headers=headers, format='json')
+        response = self.client.post(url, data, headers=headers)
+        # response = self.client.post(url, json.dumps(data), headers=headers, format='json')
+        
+        if not (response.status_code == 404):
+            json_response = json.loads(response.content)
 
+        # print(f"<{loc_url}>: response.status_code = {response.status_code}")
         self.assertEqual(response.status_code, status_code)
         if response_field_name:
             self.assertEqual(json_response[response_field_name], response_field_text)
 
-    def get_simple(self, loc_url):
+    def get_simple(self, loc_url, data={}):
         url = self.base_url + loc_url
         headers = self.get_headers()
-        data = {}
-        response = self.client.get(url, data, headers=headers, format='json')
+        # data = {}
+        # response = self.client.get(url, data, headers=headers, format='json')
+        response = self.client.get(url, data, headers=headers)
+        json_response = json.loads(response.content)
+
+        return {
+            'status_code': response.status_code,
+            'data':  json_response
+        }
+
+    def post_simple(self, loc_url, data={}):
+        url = self.base_url + loc_url
+        headers = self.get_headers()
+        # data = {}
+        # response = self.client.post(url, data, headers=headers, format='json')
+        response = self.client.post(url, data, headers=headers)
         json_response = json.loads(response.content)
 
         return {
@@ -257,6 +279,11 @@ def create_example_database_1():
     cat1 = CancelType.objects.create(name="Другая")
     cat2 = CancelType.objects.create(name="Передумал")
     cat3 = CancelType.objects.create(name="Забыл")
+
+    # print("Cancel type ids:")
+    # print(cat1.pk)
+    # print(cat2.pk)
+    # print(cat3.pk)
 
     # Slots
     Slot.objects.all().delete()
