@@ -132,6 +132,7 @@ class BaseTest(APITestCase):
         
         # response = self.client.post(url, data, headers=headers, format='json')
         response = self.client.post(url, data, headers=headers)
+        # print(response.content)
         # response = self.client.post(url, json.dumps(data), headers=headers, format='json')
         
         if not (response.status_code == 404):
