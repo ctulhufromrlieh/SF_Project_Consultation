@@ -42,6 +42,8 @@ INSTALLED_APPS = [
 
     'corsheaders',
 
+    'rest_framework_simplejwt',
+
     # 'rest_framework_swagger',
     # 'django.contrib.staticfiles',  # required for serving swagger ui's css/js files
     'drf_yasg',
@@ -155,8 +157,9 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
 
@@ -191,13 +194,44 @@ REST_FRAMEWORK = {
 #     }
 # }
 
+# SWAGGER_SETTINGS = {
+#     'SECURITY_DEFINITIONS': {
+#         'DRF Token': {
+#             'type': 'apiKey',
+#             'name': 'Authorization',
+#             'in': 'header'
+#         },
+#     },
+#     "REFETCH_SCHEMA_WITH_AUTH": True,    
+# }
+
+# SWAGGER_SETTINGS = {
+#    'SECURITY_DEFINITIONS': {
+#         'Bearer': {
+#             'type': 'apiKey',
+#             'name': 'Authorization',
+#             'in': 'header'
+#         }
+#     }
+# }
+
+# SWAGGER_SETTINGS = {
+#     'SECURITY_DEFINITIONS': {
+#         'api_key': {
+#             'type': 'apiKey',
+#             'name': 'HTTP_AUTHORIZATION',
+#             'in': 'header'
+#         }
+#     }
+# }
+
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
-        'DRF Token': {
+        'api_key': {
             'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        },
+            'in': 'header',
+            'name': 'Authorization'
+        }
     },
-    "REFETCH_SCHEMA_WITH_AUTH": True,    
+    'REFETCH_SCHEMA_WITH_AUTH': True,
 }

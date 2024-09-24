@@ -22,6 +22,12 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+
 from rest_framework.schemas import get_schema_view as get_schema_view_open_api
 # from rest_framework_swagger.views import get_swagger_view
 
@@ -44,7 +50,11 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/v1/accounts/", include("accounts.urls")),   
+    # path("api/v1/accounts/", include("accounts.urls")),   
+
+    path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
     path("api/v1/for_clients/", include("clients.urls")),   
     path("api/v1/for_specialists/", include("specialists.urls")),   
