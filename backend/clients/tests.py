@@ -5,15 +5,12 @@ from django.test import TestCase
 from rest_framework.test import APIRequestFactory, RequestsClient, APITestCase, APIClient
 
 from django.db.models import Q
-# from django.urls import reverse
 from django.contrib.auth.models import User
-
-# from rest_framework import status
-# from rest_framework.authtoken.models import Token
 
 from main.tests_common import *
 
 skip_tests = True
+# skip_tests = False
 
 class TestsMixin():
     need_params = False

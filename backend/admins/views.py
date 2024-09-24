@@ -12,65 +12,65 @@ from main.models import *
 
 class UserListView(ListAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = ForAdminUserSerializer
     permission_classes = [AdminPermission]
 
 class UserView(RetrieveAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = ForAdminUserSerializer
     permission_classes = [AdminPermission]
 
 class ClientListView(ListAPIView):
     queryset = Client.objects.all()
-    serializer_class = ClientSerializer
+    serializer_class = ForAdminClientSerializer
     permission_classes = [AdminPermission]
 
 class ClientView(RetrieveAPIView):
     queryset = Client.objects.all()
-    serializer_class = ClientSerializer
+    serializer_class = ForAdminClientSerializer
     permission_classes = [AdminPermission]
 
 class SpecialistListView(ListAPIView):
     queryset = Specialist.objects.all()
-    serializer_class = SpecialistSerializer
+    serializer_class = ForAdminSpecialistSerializer
     permission_classes = [AdminPermission]
 
 class SpecialistView(RetrieveAPIView):
     queryset = Specialist.objects.all()
-    serializer_class = SpecialistSerializer
+    serializer_class = ForAdminSpecialistSerializer
     permission_classes = [AdminPermission]
 
 # Create your views here.
 def change_user_active(request, user, active):
     if request.method == "POST":
-        if not user or not user.is_staff:
-            return Response({
-                "status": 403,
-                "error": "User is not authenticated"
-                })
+        # if not user or not user.is_staff:
+        #     return Response({
+        #         "status": 403,
+        #         "error": "User is not authenticated"
+        #         })
         
 
-    user_obj = User.objects.all().filter(user=user)
-    if not user_obj:
-        return Response({
-            "status": 400,
-            "error": "Wrong user id"
-            })
-
-    if user_obj.is_active == active:
-        if user_obj.is_active:
+        user_obj = User.objects.all().filter(user=user)
+        if not user_obj:
             return Response({
                 "status": 400,
-                "error": "User already activated"
-                })
-        else:
-            return Response({
-                "status": 400,
-                "error": "User already deactivated"
+                "error": "Wrong user id"
                 })
 
-    user_obj.is_active = active
-    user_obj.save()
+        if user_obj.is_active == active:
+            if user_obj.is_active:
+                return Response({
+                    "status": 400,
+                    "error": "User already activated"
+                    })
+            else:
+                return Response({
+                    "status": 400,
+                    "error": "User already deactivated"
+                    })
+
+        user_obj.is_active = active
+        user_obj.save()
         
 @api_view(["POST",])
 @permission_classes([AdminPermission])

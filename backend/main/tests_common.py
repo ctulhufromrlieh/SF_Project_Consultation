@@ -116,6 +116,10 @@ class BaseTest(APITestCase):
         data = {}
         # response = self.client.get(url, data, headers=headers, format='json')
         response = self.client.get(url, data, headers=headers)
+        # print("url:")
+        # print(url)
+        # print("response.content:")
+        # print(response.content)
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status_code)
