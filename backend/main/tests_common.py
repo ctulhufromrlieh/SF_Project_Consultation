@@ -8,22 +8,34 @@ from django.contrib.auth.models import User
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
+from rest_framework_simplejwt.tokens import AccessToken, AuthUser
+
 class BaseTest(APITestCase):
     base_url = ""
     token = ""
 
+    # def login(self, username, password):
+    #     user = User.objects.get(username=username)
+    #     self.token = Token.objects.create(user=user)
+    #     self.token.save()
+        
+    # def logout(self):
+    #     Token.objects.all().delete()
+
     def login(self, username, password):
-        user = User.objects.get(username=username)
-        self.token = Token.objects.create(user=user)
-        self.token.save()
+        self.token = get_token_for_user(username, password)
+        # print(self.token)
         
     def logout(self):
-        Token.objects.all().delete()
+        self.token = ""
 
     def get_headers(self):
         if (self.token):
+            # return {
+            #     "Authorization": f"Token {self.token}"
+            # }
             return {
-                "Authorization": f"Token {self.token}"
+                "Authorization": f"Bearer {self.token}"
             }
         else:
             return None
@@ -174,7 +186,8 @@ class BaseTest(APITestCase):
         }
 
 class AnonymousBaseTest(BaseTest):
-    status_code = 403
+    # status_code = 403
+    status_code = 401
     response_field_name = "detail"
     response_field_text = "Authentication credentials were not provided."
 
@@ -233,6 +246,31 @@ class SuccessBaseTest(BaseTest):
         super().tearDown()
         self.logout()
 
+# # based on https://stackoverflow.com/questions/63046840/getting-user-details-from-access-token-in-django-rest-framework-simple-jwt
+# def get_user_from_access_token_in_django_rest_framework_simplejwt(access_token_str):
+#     access_token_obj = AccessToken(access_token_str)
+#     user_id=access_token_obj['user_id']
+#     user=User.objects.get(id=user_id)
+#     print('user_id: ', user_id )
+#     print('user: ', user)
+#     print('user.id: ', user.id )
+#     content =  {'user_id': user_id, 'user':user, 'user.id':user.id}
+#     return Response(content)
+
+# based on https://stackoverflow.com/questions/63046840/getting-user-details-from-access-token-in-django-rest-framework-simple-jwt
+def get_user_from_access_token(access_token_str):
+    access_token_obj = AccessToken(access_token_str)
+    user_id=access_token_obj['user_id']
+    user=User.objects.get(id=user_id)
+    return user
+
+
+def get_token_for_user(username, password):
+    user = User.objects.filter(username=username).first()
+    if user:
+        return AccessToken.for_user(user)
+    else:
+        return None
 
 def create_example_database_only_users_1():
     # Groups
