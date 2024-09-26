@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render
 
 from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView, RetrieveAPIView
@@ -5,7 +6,7 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from main.models import Client, Specialist, Slot, SlotStatusTypes, CancelType
+from main.models import Client, Specialist, Slot, SlotStatusActionType, ReasonType, SlotAction
 from main.serializers import SpecialistSerializer, SlotSerializer
 from main.utils import to_int, is_datetimes_intersect
 from .querysets import get_slot_queryset
@@ -90,6 +91,11 @@ def sign_to_slot(request, slot=-1):
             
         slot_obj.client = user.client
         slot_obj.save()
+
+        slot_action = SlotAction.objects.create(client=user.client, slot=slot_obj, datetime=datetime.datetime.now(datetime.timezone.utc),
+                                                status=SlotStatusActionType.SLOT_STATUS_ACTION_CLIENT_SIGN, 
+                                                reason_type=None, comment="" )
+
         return Response({
             "status": 200,
             "success": "You successfully signed to slot"
@@ -118,14 +124,6 @@ def unsign_from_slot(request, slot):
                 # "status": 400,
                 "error": "Slot with such id not exists"
                 }, 400)
-        
-        # print(f"unsign_from_slot: slot_id={slot_id}")
-        # print(f"unsign_from_slot: slot_obj.client={slot_obj.client}")
-        # print(f"unsign_from_slot: user.client={user.client}")
-        # print(f"unsign_from_slot: slot_obj.client == user.client => {slot_obj.client == user.client}")
-
-        # print("request.POST:")
-        # print(request.POST.dict())
 
         if not (slot_obj.client == user.client):
             # print("unsign_from_slot: not (slot_obj.client == user.client)")
@@ -136,29 +134,41 @@ def unsign_from_slot(request, slot):
         # print("request.POST:")
         # print(request.POST.dict())
 
-        cancel_type = request.POST.get('cancel_type', -1)
-        cancel_comment = request.POST.get('cancel_comment', "")
+        # cancel_type = request.POST.get('cancel_type', -1)
+        # cancel_comment = request.POST.get('cancel_comment', "")
+        # # print(f"cancel_type from request: {cancel_type}")
+        # cancel_type_obj = CancelType.objects.filter(pk=cancel_type).first()
+        # if not cancel_type_obj:
+        #     cancel_type = -1
+        reason_type = request.POST.get('reason_type', -1)
+        comment = request.POST.get('comment', "")
         # print(f"cancel_type from request: {cancel_type}")
-        cancel_type_obj = CancelType.objects.filter(pk=cancel_type).first()
-        if not cancel_type_obj:
-            cancel_type = -1
+        reason_type_obj = ReasonType.objects.filter(pk=reason_type).first()
+        if not reason_type_obj:
+            reason_type = -1
 
         # print(f"unsign_from_slot: cancel_type={cancel_type}")
         # print(f"unsign_from_slot: cancel_comment={cancel_comment}")
 
-        if (cancel_type == -1) and (not cancel_comment):
+        if (reason_type == -1) and (not comment):
             return Response({
-                "error": "You should set valid Cancel Type or set non-empty Cancel comment"
+                "error": "You should set valid Reason Type or set non-empty comment"
                 }, 400)
             
         slot_obj.client = None
-        slot_obj.status = SlotStatusTypes.SLOT_STATUS_CANCELED
-        if not (cancel_type == -1):
-            slot_obj.cancel_type = cancel_type_obj
-        else:
-            slot_obj.cancel_comment = cancel_comment
-
+        slot_obj.is_accepted = False
         slot_obj.save()
+
+        slot_action = SlotAction.objects.create(client=user.client, slot=slot_obj, datetime=datetime.datetime.now(datetime.timezone.utc),
+                                                status=SlotStatusActionType.SLOT_STATUS_ACTION_CLIENT_UNSIGN, 
+                                                reason_type=reason_type_obj, comment=comment )
+
+        # if not (reason_type == -1):
+        #     slot_obj.cancel_type = cancel_type_obj
+        # else:
+        #     slot_obj.cancel_comment = cancel_comment
+
+        # slot_obj.save()
 
         # print(f"slot_obj.cancel_comment={slot_obj.cancel_comment}")
 

@@ -68,11 +68,11 @@ class AdminTests(TestsMixin, ForbiddenBaseTest):
     password = "admin1psw"
 
 @unittest.skipIf(skip_tests, "Skip these tests")
-class ClientTests(TestsMixin, SuccessBaseTest):
+class SpecialistTests(TestsMixin, SuccessBaseTest):
     base_url = "/api/v1/for_specialists"
 
-    username = "client1"
-    password = "client1psw"
+    username = "spec1"
+    password = "spec1psw"
     myspec = None
 
     need_params = True

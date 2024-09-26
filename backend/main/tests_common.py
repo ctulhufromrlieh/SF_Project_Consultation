@@ -81,11 +81,11 @@ class BaseTest(APITestCase):
             # type_id = -1
             type_id = None
 
-        if obj.cancel_type:
-            cancel_type_id = obj.cancel_type.pk
-        else:
-            # cancel_type_id = -1
-            cancel_type_id = None
+        # if obj.cancel_type:
+        #     cancel_type_id = obj.cancel_type.pk
+        # else:
+        #     # cancel_type_id = -1
+        #     cancel_type_id = None
 
         dict_datetime1 = datetime.strptime(f"{dict['datetime1']} +00:00", "%Y-%m-%d %H:%M:%S %z")
         dict_datetime2 = datetime.strptime(f"{dict['datetime2']} +00:00", "%Y-%m-%d %H:%M:%S %z")
@@ -117,9 +117,10 @@ class BaseTest(APITestCase):
             # (obj.datetime2 == dict["datetime2"]) and
             (obj.description == dict["description"]) and
             (obj.cost == dict["cost"]) and
-            (obj.status == dict["status"]) and
-            (cancel_type_id == dict["cancel_type"]) and
-            (obj.cancel_comment == dict["cancel_comment"])
+            (obj.is_accepted == dict["is_accepted"]) 
+            # (obj.status == dict["status"]) and
+            # (cancel_type_id == dict["cancel_type"]) and
+            # (obj.cancel_comment == dict["cancel_comment"])
         )
 
     def check_get_simple(self, loc_url, status_code, response_field_name, response_field_text, data={}):
@@ -316,12 +317,18 @@ def create_example_database_1():
     cot1 = ConsultType.objects.create(name="Математика")
     cot2 = ConsultType.objects.create(name="Физика")
 
-    # CancelType
-    CancelType.objects.all().delete()
+    # # CancelType
+    # CancelType.objects.all().delete()
 
-    cat1 = CancelType.objects.create(name="Другая")
-    cat2 = CancelType.objects.create(name="Передумал")
-    cat3 = CancelType.objects.create(name="Забыл")
+    # cat1 = CancelType.objects.create(name="Другая")
+    # cat2 = CancelType.objects.create(name="Передумал")
+    # cat3 = CancelType.objects.create(name="Забыл")
+    # ReasonType
+    ReasonType.objects.all().delete()
+
+    rt1 = ReasonType.objects.create(name="Другая")
+    rt2 = ReasonType.objects.create(name="Передумал")
+    rt3 = ReasonType.objects.create(name="Забыл")
 
     # print("Cancel type ids:")
     # print(cat1.pk)
