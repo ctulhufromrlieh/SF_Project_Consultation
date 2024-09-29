@@ -10,6 +10,9 @@ def to_int(str_value, def_value):
 
 def get_slot_queryset(request, is_only_available=True):
     user = request.user
+    if not Client.is_own(user):
+        return Slot.objects.none()
+    
     client = user.client
 
     specialist_id = to_int(request.GET.get('specialist', ''), -1)

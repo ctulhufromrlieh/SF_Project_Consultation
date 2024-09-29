@@ -31,7 +31,7 @@ from rest_framework_simplejwt.views import (
 from rest_framework.schemas import get_schema_view as get_schema_view_open_api
 # from rest_framework_swagger.views import get_swagger_view
 
-from main.views import *
+# from main.views import *
 
 # schema_view = get_swagger_view(title='Pastebin API')
 schema_view = get_schema_view(

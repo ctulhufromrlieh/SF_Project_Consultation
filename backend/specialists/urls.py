@@ -22,5 +22,8 @@ from .views import *
 
 urlpatterns = [
     path('slots', SlotListView.as_view(), name='api_specialists_slot_list'),
-    path('slots/<int:pk>', SlotView.as_view(), name='api_specialists_slot_one'),
+    # path('slots/create', SlotCreateView.as_view(), name='api_specialists_slot_create'),
+    path('slots/<int:pk>', SlotOneView.as_view(), name='api_specialists_slot_one'),
+    path('slots/accept/<int:slot>', accept_slot, name='api_specialists_accept_slot'),
+    path('slots/decline/<int:slot>', decline_slot, name='api_specialists_decline_slot'),    
 ]

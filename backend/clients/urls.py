@@ -24,7 +24,7 @@ urlpatterns = [
     path('specialists', SpecialistListView.as_view(), name='api_clients_specialist_list'),
     path('specialists/<int:pk>', SpecialistView.as_view(), name='api_clients_specialist_one'),
     path('slots', SlotListView.as_view(), name='api_clients_slot_list'),
-    path('slots/<int:pk>', SlotView.as_view(), name='api_clients_slot_one'),
+    path('slots/<int:pk>', SlotOneView.as_view(), name='api_clients_slot_one'),
     path('slots/sign/<int:slot>', sign_to_slot, name='api_clients_sign_to_slot'),
     path('slots/unsign/<int:slot>', unsign_from_slot, name='api_clients_unsign_from_slot'),
 ]

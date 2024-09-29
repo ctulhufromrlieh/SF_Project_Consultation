@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render
 
 from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView, RetrieveAPIView
@@ -5,11 +6,12 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from main.models import Client, Specialist, Slot
-from main.serializers import SpecialistSerializer, SlotSerializer, SlotUpdateSerializer
+from main.models import Client, Specialist, Slot, SlotAction, SlotStatusActionType
+# from main.serializers import SpecialistSerializer, SlotSerializer, SlotUpdateSerializer
 from main.utils import to_int, is_datetimes_intersect
 from .querysets import get_slot_queryset
 from .permissions import SpecialistPermission
+from .serializers import SlotSerializerRead, SlotSerializerWrite
 
 
 # import main.models
@@ -21,43 +23,135 @@ from .permissions import SpecialistPermission
 
 class SlotListView(ListCreateAPIView):
     # queryset = Slot.objects.all()
-    serializer_class = SlotSerializer
+    # serializer_class = SlotSerializerRead
     permission_classes = [SpecialistPermission]
 
     def get_queryset(self):
         return get_slot_queryset(self.request)
+    
+    def get_serializer(self, *args, **kwargs):
+        if self.request.method == "GET":
+            return SlotSerializerRead(*args, **kwargs)
+        elif self.request.method == "POST":
+            return SlotSerializerWrite(*args, **kwargs)
+        else:
+            raise Exception("SlotListView.get_serializer: Wrong self.request.method")
+    
+    def perform_create(self, serializer):
+        # super().perform_create(serializer)
+        serializer.save(specialist=self.request.user.specialist)
 
-class SlotView(RetrieveUpdateDestroyAPIView):
+class SlotOneView(RetrieveUpdateDestroyAPIView):
     # queryset = Slot.objects.all()
-    # serializer_class = SlotSerializer
+    serializer_class = SlotSerializerWrite
     permission_classes = [SpecialistPermission]
     
     def get_queryset(self):
         return get_slot_queryset(self.request)    
     
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return SlotSerializer
-        elif self.request.method == 'PUT':
-            return SlotUpdateSerializer
-        elif self.request.method == 'DELETE':
-            return SlotSerializer
+    # def get_serializer_class(self, *args, **kwargs):
+    #     if self.request.method == "GET":
+    #         return SlotSerializerRead(*args, **kwargs)
+    #     elif self.request.method == "PUT":
+    #         return SlotSerializerWrite(*args, **kwargs)
+    #     elif self.request.method == "PATCH":
+    #         return SlotSerializerWrite(*args, **kwargs)        
+    #     elif self.request.method == "DELETE":
+    #         return SlotSerializerWrite(*args, **kwargs)
+    #     else:
+    #         raise Exception("SlotOneView.get_serializer_class: Wrong self.request.method")
+
+@api_view(["POST",])
+@permission_classes([SpecialistPermission])
+def accept_slot(request, slot=-1):
+    if request.method == "POST":
+        user = request.user
+
+        if slot:
+            slot_id=slot
+        else:
+            slot_id=-1
+
+        if slot_id == -1:
+            return Response({
+                "error": "Slot id not defined"
+                }, 400)
         
-        raise Exception("SlotView.get_serializer_class: wrong self.request.method")
+        slot_obj = Slot.objects.filter(id=slot_id).first()
+        if not slot_obj:
+            return Response({
+                "error": "Slot with such id not exists"
+                }, 400)
+        
+        if slot_obj.specialist.user != user:
+            return Response({
+                "error": "It is not your slot"
+                }, 400)
 
+        if not slot_obj.client:
+            return Response({
+                "error": "Client is not assigned yet"
+                }, 400)
+       
+        if  slot_obj.is_accepted:
+            return Response({
+                "error": "This slot already accepted"
+                }, 400)
 
-# class SlotView(RetrieveAPIView):
-#     # queryset = Slot.objects.all()
-#     serializer_class = SlotSerializer
-#     permission_classes = [SpecialistPermission]
-    
-#     def get_queryset(self):
-#         return get_slot_queryset(self.request)
+        slot_obj.is_accepted = True
+        slot_obj.save()
 
-# class SlotUpdateView(UpdateAPIView):
-#     # queryset = Slot.objects.all()
-#     serializer_class = SlotUpdateSerializer
-#     permission_classes = [SpecialistPermission]
+        slot_action = SlotAction.objects.create(client=slot_obj.client, slot=slot_obj, datetime=datetime.datetime.now(datetime.timezone.utc),
+                                                status=SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_ACCEPT, 
+                                                reason_type=None, comment="" )
 
-#     def get_queryset(self):
-#         return get_slot_queryset(self.request)
+        return Response({
+            "status": 200,
+            "success": "You successfully accept slot"
+            })
+
+@api_view(["POST",])
+@permission_classes([SpecialistPermission])
+def decline_slot(request, slot=-1):
+    if request.method == "POST":
+        user = request.user
+
+        if slot:
+            slot_id=slot
+        else:
+            slot_id=-1
+
+        if slot_id == -1:
+            return Response({
+                "error": "Slot id not defined"
+                }, 400)
+        
+        slot_obj = Slot.objects.filter(id=slot_id).first()
+        if not slot_obj:
+            return Response({
+                "error": "Slot with such id not exists"
+                }, 400)
+        
+        if slot_obj.specialist.user != user:
+            return Response({
+                "error": "It is not your slot"
+                }, 400)
+
+        if not slot_obj.client:
+            return Response({
+                "error": "Client is not assigned yet"
+                }, 400)
+       
+        client = slot_obj.client
+
+        slot_obj.client = None
+        slot_obj.save()
+
+        slot_action = SlotAction.objects.create(client=client, slot=slot_obj, datetime=datetime.datetime.now(datetime.timezone.utc),
+                                                status=SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_DECLINE, 
+                                                reason_type=None, comment="" )
+
+        return Response({
+            "status": 200,
+            "success": "You successfully decline slot"
+            })

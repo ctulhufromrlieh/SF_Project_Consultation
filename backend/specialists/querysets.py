@@ -2,6 +2,8 @@ from main.models import *
 
 def get_slot_queryset(request):
     user = request.user
+    if not Specialist.is_own(user):
+        return Slot.objects.none()    
 
     specialist_id = user.specialist.id
     # specialist_id = -1
