@@ -1,5 +1,7 @@
 import datetime
+# import serializers
 from django.shortcuts import render
+from django.http import HttpResponseBadRequest
 
 from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework import permissions
@@ -30,6 +32,7 @@ class SlotListView(ListCreateAPIView):
         return get_slot_queryset(self.request)
     
     def get_serializer(self, *args, **kwargs):
+        kwargs["context"] = self.get_serializer_context()
         if self.request.method == "GET":
             return SlotSerializerRead(*args, **kwargs)
         elif self.request.method == "POST":
@@ -37,9 +40,31 @@ class SlotListView(ListCreateAPIView):
         else:
             raise Exception("SlotListView.get_serializer: Wrong self.request.method")
     
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        # print("get_serializer_context:")
+        # print(context)
+        return context
+
     def perform_create(self, serializer):
         # super().perform_create(serializer)
+        # raise ValueError("123456")
+        # raise HttpResponseBadRequest("qwerty")
         serializer.save(specialist=self.request.user.specialist)
+
+    # def validate(self, data):
+    #     super().validate()
+    #     errors = {}
+        
+    #     # required fields
+    #     required_fields = ['username', 'password', 'email']
+    #     for field in required_fields:
+    #         if field not in data:
+    #             errors[field] = 'This field is required.'
+        
+    #     if errors:
+    #         raise serializers.ValidationError(errors)
 
 class SlotOneView(RetrieveUpdateDestroyAPIView):
     # queryset = Slot.objects.all()
