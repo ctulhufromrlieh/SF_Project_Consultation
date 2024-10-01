@@ -22,7 +22,7 @@ def account_info(request):
         user = request.user
 
         account_type = 'ACCOUNT_TYPE_OTHER'
-        print(user)
+        # print(user)
         if user:
             name = ''
             if Client.is_own(user):

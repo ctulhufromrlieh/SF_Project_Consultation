@@ -12,7 +12,7 @@ def get_slot_queryset(request):
     # else:
     #     specialist_id = to_int(request.GET.get('specialist', ''), -1)
 
-    print("specialist=", specialist_id)
+    # print("specialist=", specialist_id)
 
     res = Slot.objects.all()
 

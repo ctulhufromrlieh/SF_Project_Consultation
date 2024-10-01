@@ -93,21 +93,24 @@ class BaseTest(APITestCase):
         # print(dict)
 
         # print(f'obj.pk == dict["id"]=>{obj.pk} == {dict["id"]}=>{obj.pk == dict["id"]}')
-        # print(f'client_id == dict["client"]=>{client_id} == {dict["client"]}=>{client_id == dict["client"]}')
-        # print(f'specialist_id == dict["specialist"]=>{specialist_id} == {dict["specialist"]}=>{specialist_id == dict["specialist"]}')
+        # # print(f'client_id == dict["client"]=>{client_id} == {dict["client"]}=>{client_id == dict["client"]}')
+        # print(f'client_id == dict["client"]=>{client_id} == {dict.get("client", None)}=>{client_id == dict.get("client", None)}')
+        # # print(f'specialist_id == dict["specialist"]=>{specialist_id} == {dict["specialist"]}=>{specialist_id == dict["specialist"]}')
+        # print(f'specialist_id == dict["specialist"]=>{specialist_id} == {dict.get("specialist", None)}=>{specialist_id == dict.get("specialist", None)}')
         # print(f'type_id == dict["type"]=>{type_id} == {dict["type"]}=>{type_id == dict["type"]}')
         # print(f'obj.title == dict["title"]=>{obj.title} == {dict["title"]}=>{obj.title == dict["title"]}')
         # print(f'obj.datetime1==dict_datetime1=>{obj.datetime1}=={dict_datetime1}=>{obj.datetime1==dict_datetime1}')
         # print(f'obj.datetime2==dict_datetime2=>{obj.datetime2}=={dict_datetime2}=>{obj.datetime2==dict_datetime2}')
         # print(f'obj.description==dict["description"]=>{obj.description}=={dict["description"]}=>{obj.description==dict["description"]}')
         # print(f'obj.cost==dict["cost"]=>{obj.cost}=={dict["cost"]}=>{obj.cost==dict["cost"]}')
-        # print(f'obj.status==dict["status"]=>{obj.status}=={dict["status"]}=>{obj.status==dict["status"]}')
-        # print(f'cancel_type_id==dict["cancel_type"]=>{cancel_type_id}=={dict["cancel_type"]}=>{cancel_type_id==dict["cancel_type"]}')
-        # print(f'obj.cancel_comment==dict["cancel_comment"]=>{obj.cancel_comment}=={dict["cancel_comment"]}=>{obj.cancel_comment==dict["cancel_comment"]}')
+        # # print(f'obj.status==dict["status"]=>{obj.status}=={dict["status"]}=>{obj.status==dict["status"]}')
+        # # print(f'cancel_type_id==dict["cancel_type"]=>{cancel_type_id}=={dict["cancel_type"]}=>{cancel_type_id==dict["cancel_type"]}')
+        # # print(f'obj.cancel_comment==dict["cancel_comment"]=>{obj.cancel_comment}=={dict["cancel_comment"]}=>{obj.cancel_comment==dict["cancel_comment"]}')
 
         return (
             (obj.pk == dict["id"]) and
-            (client_id == dict["client"]) and
+            # (client_id == dict["client"]) and
+            (client_id == dict.get("client", None)) and
             (specialist_id == dict["specialist"]) and
             (type_id == dict["type"]) and
             (obj.title == dict["title"]) and

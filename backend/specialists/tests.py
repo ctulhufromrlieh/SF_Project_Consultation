@@ -82,83 +82,60 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         self.myspec = Specialist.objects.get(user__username=self.username)
         # print(self.myclient)
 
-    # def atest_specialist_list(self):
-    #     specs_b = Specialist.objects.all()
+    def atest_slot_list(self):
+        slots_b = Slot.objects.filter(specialist=self.myspec)
 
-    #     resp_result = self.get_simple("/specialists")
-    #     # print(resp_result)
-    #     specs_r = resp_result["data"]
+        resp_result = self.get_simple("/slots")
+        slots_r = resp_result["data"]
 
-    #     # self.assertEqual(resp_result["status_code"], 200)
-    #     self.assertEqual(specs_b.count(), len(specs_r))
+        self.assertEqual(slots_b.count(), len(slots_r))
 
-    #     for i in range(len(specs_r)):
-    #         curr_spec_r = specs_r[i]
-    #         curr_spec_b = specs_b[i]
-    #         self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
-    
-    # def atest_specialist_one(self):
-    #     ids = [1, 2]
-    #     for curr_id in ids:
-    #         curr_loc_url = f"/specialists/{curr_id}"
-    #         curr_resp_result = self.get_simple(curr_loc_url)
-    #         curr_spec_r = curr_resp_result["data"]
-    #         curr_spec_b = Specialist.objects.get(pk=curr_id)
-
-    #         # self.assertEqual(resp_result["status_code"], 200)
-    #         self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
-
-    # def atest_slot_list(self):
-    #     slots_b = Slot.objects.filter(Q(client=None) | Q(client=self.myclient))
-
-    #     resp_result = self.get_simple("/slots")
-    #     slots_r = resp_result["data"]
-
-    #     # self.assertEqual(resp_result["status_code"], 200)
-    #     self.assertEqual(slots_b.count(), len(slots_r))
-
-    #     for i in range(len(slots_r)):
-    #         curr_slot_r = slots_r[i]
-    #         curr_slot_b = slots_b[i]
+        for i in range(len(slots_r)):
+            curr_slot_r = slots_r[i]
+            curr_slot_b = slots_b[i]
             
-    #         self.assertTrue(self.is_slots_equal(curr_slot_b, curr_slot_r))
+            self.assertTrue(self.is_slots_equal(curr_slot_b, curr_slot_r))
 
-    # def test_get(self):
-    #     self.atest_specialist_list()
-    #     self.atest_specialist_one()
-    #     self.atest_slot_list()
+    def atest_slot_one(self):
+        slots_b = Slot.objects.filter(specialist=self.myspec)
 
-    # def test_slot_sign_and_unsign_1(self):
-    #     # sign
-    #     self.check_post_simple("/slots/sign/", 404, "", "")
-    #     self.check_post_simple("/slots/sign/100500", 400, "error", "Slot with such id not exists")
-    #     self.check_post_simple("/slots/sign/1", 400, "error", "This slot already used by you")
-    #     self.check_post_simple("/slots/sign/2", 400, "error", "This slot already used")
+        for curr_slot_b in slots_b:
+            resp_result = self.get_simple(f"/slots/{curr_slot_b.pk}")
+            curr_slot_r = resp_result["data"]
+            self.assertTrue(self.is_slots_equal(curr_slot_b, curr_slot_r))
 
-    #     slot = Slot.objects.get(pk=3)
-    #     self.assertEqual(slot.client, None)
+    def test_get(self):
+        self.atest_slot_list()
+        self.atest_slot_one()
 
-    #     self.check_post_simple("/slots/sign/3", 200, "success", "You successfully signed to slot")
-    #     self.check_post_simple("/slots/sign/1", 400, "error", "This slot already used by you")
+    def test_slot_accept_and_decline_1(self):
+        # sign
+        self.check_post_simple("/slots/accept/", 404, "", "")
+        self.check_post_simple("/slots/accept/100500", 400, "error", "Slot with such id not exists")
+        self.check_post_simple("/slots/accept/4", 400, "error", "It is not your slot")
+        self.check_post_simple("/slots/accept/3", 400, "error", "Client is not assigned yet")
 
-    #     slot = Slot.objects.get(pk=3)
-    #     self.assertEqual(slot.client, self.myclient)
+        slot = Slot.objects.get(pk=1)
+        self.assertEqual(slot.is_accepted, False)
+        self.check_post_simple("/slots/accept/1", 200, "success", "You successfully accept slot")
+        slot = Slot.objects.get(pk=1)
+        self.assertEqual(slot.is_accepted, True)
+        self.check_post_simple("/slots/accept/1", 400, "error", "This slot already accepted")
 
-    #     self.check_post_simple("/slots/sign/3", 400, "error", "This slot already used by you")
 
-    #     # unsign
-    #     self.check_post_simple("/slots/unsign/", 404, "", "")
-    #     self.check_post_simple("/slots/unsign/100500", 400, "error", "Slot with such id not exists")
-    #     self.check_post_simple("/slots/unsign/2", 400, "error", "You are not signed to this slot")
-    #     self.check_post_simple("/slots/unsign/1", 400, "error", "You should set valid Cancel Type or set non-empty Cancel comment")
-    #     self.check_post_simple("/slots/unsign/3", 400, "error", "You should set valid Cancel Type or set non-empty Cancel comment")
-    #     self.check_post_simple("/slots/unsign/1", 400, "error", "You should set valid Cancel Type or set non-empty Cancel comment", data={"cancel_type": 100500})
-        
-    #     self.assertEqual(Slot.objects.filter(pk=1).first().cancel_type, None)
-    #     self.check_post_simple("/slots/unsign/1", 200, "success", "You successfully unsigned from slot", data={"cancel_type": 1})
-    #     self.assertEqual(Slot.objects.filter(pk=1).first().cancel_type.pk, 1)
+        self.check_post_simple("/slots/decline/", 404, "", "")
+        self.check_post_simple("/slots/decline/100500", 400, "error", "Slot with such id not exists")
+        self.check_post_simple("/slots/decline/4", 400, "error", "It is not your slot")
+        self.check_post_simple("/slots/decline/3", 400, "error", "Client is not assigned yet")
 
-    #     self.assertEqual(Slot.objects.filter(pk=1).first().cancel_comment, "")
-    #     self.check_post_simple("/slots/unsign/3", 200, "success", "You successfully unsigned from slot", data={"cancel_comment": "I am sorry"})
-    #     self.assertEqual(Slot.objects.filter(pk=3).first().cancel_comment, "I am sorry")
-    #     # print(resp_result)
+        slot = Slot.objects.get(pk=2)
+        client = Client.objects.get(pk=2)
+        self.assertEqual(slot.client, client)
+
+        self.check_post_simple("/slots/decline/2", 200, "success", "You successfully decline slot")
+
+        slot = Slot.objects.get(pk=2)
+        self.assertEqual(slot.client, None)
+
+        self.check_post_simple("/slots/decline/2", 400, "error", "Client is not assigned yet")
+

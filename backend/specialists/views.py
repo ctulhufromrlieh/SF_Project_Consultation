@@ -74,17 +74,17 @@ class SlotOneView(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return get_slot_queryset(self.request)    
     
-    # def get_serializer_class(self, *args, **kwargs):
-    #     if self.request.method == "GET":
-    #         return SlotSerializerRead(*args, **kwargs)
-    #     elif self.request.method == "PUT":
-    #         return SlotSerializerWrite(*args, **kwargs)
-    #     elif self.request.method == "PATCH":
-    #         return SlotSerializerWrite(*args, **kwargs)        
-    #     elif self.request.method == "DELETE":
-    #         return SlotSerializerWrite(*args, **kwargs)
-    #     else:
-    #         raise Exception("SlotOneView.get_serializer_class: Wrong self.request.method")
+    def get_serializer(self, *args, **kwargs):
+        if self.request.method == "GET":
+            return SlotSerializerRead(*args, **kwargs)
+        elif self.request.method == "PUT":
+            return SlotSerializerWrite(*args, **kwargs)
+        elif self.request.method == "PATCH":
+            return SlotSerializerWrite(*args, **kwargs)        
+        elif self.request.method == "DELETE":
+            return SlotSerializerWrite(*args, **kwargs)
+        else:
+            raise Exception("SlotOneView.get_serializer_class: Wrong self.request.method")
 
 @api_view(["POST",])
 @permission_classes([SpecialistPermission])
@@ -171,6 +171,8 @@ def decline_slot(request, slot=-1):
 
         slot_obj.client = None
         slot_obj.save()
+
+        # print(f"client={client}")
 
         slot_action = SlotAction.objects.create(client=client, slot=slot_obj, datetime=datetime.datetime.now(datetime.timezone.utc),
                                                 status=SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_DECLINE, 

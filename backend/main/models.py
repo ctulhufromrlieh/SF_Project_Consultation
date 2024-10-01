@@ -100,7 +100,12 @@ class Slot(models.Model):
         else:
             client_name = "<Unknown>"
 
-        return f"{self.datetime1} : {spec_name} - {client_name} -- {self.status}"
+        if self.is_accepted:
+            is_accepted_str = "<Accepted>"
+        else:
+            is_accepted_str = "<Not accepted>"
+
+        return f"{self.datetime1} : {spec_name} - {client_name} -- {is_accepted_str}"
 
 
 class SlotAction(models.Model):

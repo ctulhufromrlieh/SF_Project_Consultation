@@ -123,10 +123,19 @@ class ClientTests(TestsMixin, SuccessBaseTest):
             
             self.assertTrue(self.is_slots_equal(curr_slot_b, curr_slot_r))
 
+    def atest_slot_one(self):
+        slots_b = Slot.objects.filter(client=self.myclient)
+
+        for curr_slot_b in slots_b:
+            resp_result = self.get_simple(f"/slots/{curr_slot_b.pk}")
+            curr_slot_r = resp_result["data"]
+            self.assertTrue(self.is_slots_equal(curr_slot_b, curr_slot_r))
+
     def test_get(self):
         self.atest_specialist_list()
         self.atest_specialist_one()
         self.atest_slot_list()
+        self.atest_slot_one()
 
     def test_slot_sign_and_unsign_1(self):
         # sign

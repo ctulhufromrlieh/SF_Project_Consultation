@@ -50,7 +50,7 @@ def send_email_about_slot_action(slot_action):
             f"Специалист {slot_action.slot.specialist.user.username} одобрил Вашу заявку на {slot_action.slot.pk}!"
         )
     elif slot_action.status == SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_DECLINE:
-        to_user = slot_action.slot.client.user
+        to_user = slot_action.client.user
         text_content = (
             f"Уважаемый {to_user.username}!\n"
             f"Специалист {slot_action.slot.specialist.user.username} отклонил Вашу заявку на {slot_action.slot.pk}!"
