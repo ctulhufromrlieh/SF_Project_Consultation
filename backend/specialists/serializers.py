@@ -40,8 +40,17 @@ class SlotSerializerWrite(serializers.ModelSerializer):
 
     def validate(self, data):
         # print(self.context)
+        # print("context:")
+        # print(self.context)
+        # print("data:")
+        # print(data)
         request = self.context["request"]
         user = request.user
+        instance = self.context.get("instance", None)
+        # if instance:
+        #     my_id = instance.pk
+        # else:
+        #     my_id = -1
 
         errors = {}
 
@@ -49,6 +58,8 @@ class SlotSerializerWrite(serializers.ModelSerializer):
         datetime2 = data["datetime2"]
 
         specialist_slots = Slot.objects.all().filter(specialist=user.specialist)
+        if instance:
+            specialist_slots = specialist_slots.exclude(pk=instance.pk)
         for curr_slot in specialist_slots:
             curr_datetime_1 = curr_slot.datetime1
             curr_datetime_2 = curr_slot.datetime2

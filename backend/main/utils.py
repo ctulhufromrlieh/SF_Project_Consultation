@@ -1,3 +1,4 @@
+from datetime import datetime
 from .models import *
 
 def to_int(str_value, def_value):
@@ -34,3 +35,9 @@ def get_user_type_caption(user):
         return "Admin"
     else:
         return "Anonymous"
+    
+def str_to_datetime(str, tz_str=""):
+    if tz_str:
+        return datetime.strptime(f"{str} {tz_str}", "%Y-%m-%d %H:%M:%S %z")
+    else:
+        return datetime.strptime(f"{str}", "%Y-%m-%d %H:%M:%S %z")

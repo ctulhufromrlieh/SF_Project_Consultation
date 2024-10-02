@@ -1,14 +1,15 @@
 import json
 from datetime import datetime
 
-from main.models import *
-from main.debug_helpers import *
 from django.contrib.auth.models import User
-
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.authtoken.models import Token
 
 from rest_framework_simplejwt.tokens import AccessToken, AuthUser
+
+from main.models import *
+from main.debug_helpers import *
+from main.utils import *
 
 class BaseTest(APITestCase):
     base_url = ""
@@ -87,8 +88,10 @@ class BaseTest(APITestCase):
         #     # cancel_type_id = -1
         #     cancel_type_id = None
 
-        dict_datetime1 = datetime.strptime(f"{dict['datetime1']} +00:00", "%Y-%m-%d %H:%M:%S %z")
-        dict_datetime2 = datetime.strptime(f"{dict['datetime2']} +00:00", "%Y-%m-%d %H:%M:%S %z")
+        # dict_datetime1 = datetime.strptime(f"{dict['datetime1']} +00:00", "%Y-%m-%d %H:%M:%S %z")
+        # dict_datetime2 = datetime.strptime(f"{dict['datetime2']} +00:00", "%Y-%m-%d %H:%M:%S %z")
+        dict_datetime1 = str_to_datetime(dict["datetime1"], "+00:00")
+        dict_datetime2 = str_to_datetime(dict["datetime2"], "+00:00")
 
         # print(dict)
 
@@ -147,21 +150,52 @@ class BaseTest(APITestCase):
     def check_post_simple(self, loc_url, status_code, response_field_name, response_field_text, data={}):
         url = self.base_url + loc_url
         headers = self.get_headers()
-        # data = {}
-        # print(data)
         
-        # response = self.client.post(url, data, headers=headers, format='json')
         response = self.client.post(url, data, headers=headers)
-        # print(response.content)
-        # response = self.client.post(url, json.dumps(data), headers=headers, format='json')
         
         if not (response.status_code == 404):
             json_response = json.loads(response.content)
 
-        # print(f"<{loc_url}>: response.status_code = {response.status_code}")
         self.assertEqual(response.status_code, status_code)
         if response_field_name:
             self.assertEqual(json_response[response_field_name], response_field_text)
+
+    def check_put_simple(self, loc_url, status_code, response_field_name, response_field_text, data={}):
+        url = self.base_url + loc_url
+        headers = self.get_headers()
+        
+        # print("check_put_simple:")
+        response = self.client.put(url, data, headers=headers)
+        
+        if not (response.status_code == 404):
+            json_response = json.loads(response.content)
+
+        # print(json_response)
+
+        self.assertEqual(response.status_code, status_code)
+        if response_field_name:
+            self.assertEqual(json_response[response_field_name], response_field_text)
+
+    def check_patch_simple(self, loc_url, status_code, response_field_name, response_field_text, data={}):
+        url = self.base_url + loc_url
+        headers = self.get_headers()
+        
+        response = self.client.patch(url, data, headers=headers)
+        
+        if not (response.status_code == 404):
+            json_response = json.loads(response.content)
+
+        self.assertEqual(response.status_code, status_code)
+        if response_field_name:
+            self.assertEqual(json_response[response_field_name], response_field_text)
+
+    def check_delete_simple(self, loc_url, status_code, data={}):
+        url = self.base_url + loc_url
+        headers = self.get_headers()
+        
+        response = self.client.delete(url, data, headers=headers)
+        
+        self.assertEqual(response.status_code, status_code)
 
     def get_simple(self, loc_url, data={}):
         url = self.base_url + loc_url

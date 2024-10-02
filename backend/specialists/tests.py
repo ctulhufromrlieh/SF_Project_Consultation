@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 
 from main.tests_common import *
+from main.utils import *
 
 # skip_tests = True
 skip_tests = False
@@ -139,3 +140,100 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
 
         self.check_post_simple("/slots/decline/2", 400, "error", "Client is not assigned yet")
 
+    def test_create_update_delete(self):
+        self.assertEqual(Slot.objects.count(), 6)
+
+        self.check_post_simple("/slots", 400, "", "")
+
+        self.check_post_simple("/slots", 400, "", "", {
+            "type": 20,
+            "title": "the title",
+            "datetime1": "2024-06-10 12:00 +03:00",
+            "datetime2": "2024-06-10 14:00 +03:00",
+            "description": "the description of slot",
+            "cost": 1234
+        })
+
+        self.check_post_simple("/slots", 201, "", "", {
+            "type": 1,
+            "title": "the title",
+            "datetime1": "2024-06-10 12:00 +03:00",
+            "datetime2": "2024-06-10 14:00 +03:00",
+            "description": "the description of slot",
+            "cost": 1234
+        })
+
+        self.assertEqual(Slot.objects.count(), 7)
+
+        slot = Slot.objects.order_by("pk").last()
+        self.assertEqual(slot.type.pk, 1)
+        self.assertEqual(slot.title, "the title")
+        self.assertEqual(slot.datetime1, datetime.strptime("2024-06-10 12:00 +03:00", "%Y-%m-%d %H:%M %z"))
+        self.assertEqual(slot.datetime2, datetime.strptime("2024-06-10 14:00 +03:00", "%Y-%m-%d %H:%M %z"))
+        self.assertEqual(slot.description, "the description of slot")
+        self.assertEqual(slot.cost, 1234)
+
+        self.check_post_simple("/slots", 400, "", "", {
+            "type": 1,
+            "title": "the title",
+            "datetime1": "2024-06-10 13:30 +03:00",
+            "datetime2": "2024-06-10 15:30 +03:00",
+            "description": "the description of slot",
+            "cost": 1234
+        })
+
+        self.check_post_simple("/slots", 201, "", "", {
+            "type": 1,
+            "title": "the title",
+            "datetime1": "2024-06-10 14:00 +03:00",
+            "datetime2": "2024-06-10 16:00 +03:00",
+            "description": "the description of slot",
+            "cost": 1234
+        })        
+
+        # put
+        slot = Slot.objects.order_by("pk").last()
+        self.check_put_simple(f"/slots/{slot.pk}", 200, "", "", {
+            "type": 2,
+            "title": "the title new",
+            "datetime1": "2024-06-10 16:00 +03:00",
+            "datetime2": "2024-06-10 18:00 +03:00",
+            "description": "the description of slot new",
+            "cost": 12345
+        })
+
+        slot = Slot.objects.order_by("pk").last()
+        self.assertEqual(slot.type.pk, 2)
+        self.assertEqual(slot.title, "the title new")
+        self.assertEqual(slot.datetime1, datetime.strptime("2024-06-10 16:00 +03:00", "%Y-%m-%d %H:%M %z"))
+        self.assertEqual(slot.datetime2, datetime.strptime("2024-06-10 18:00 +03:00", "%Y-%m-%d %H:%M %z"))
+        self.assertEqual(slot.description, "the description of slot new")
+        self.assertEqual(slot.cost, 12345)
+
+        # patch
+        slot = Slot.objects.order_by("pk").last()
+        self.check_patch_simple(f"/slots/{slot.pk}", 200, "", "", {
+            "type": 1,
+            "title": "the title new new",
+            "datetime1": "2024-06-10 17:00 +03:00",
+            "datetime2": "2024-06-10 19:00 +03:00",
+            "description": "the description of slot new new",
+            "cost": 123456
+        })
+
+        slot = Slot.objects.order_by("pk").last()
+        self.assertEqual(slot.type.pk, 1)
+        self.assertEqual(slot.title, "the title new new")
+        self.assertEqual(slot.datetime1, datetime.strptime("2024-06-10 17:00 +03:00", "%Y-%m-%d %H:%M %z"))
+        self.assertEqual(slot.datetime2, datetime.strptime("2024-06-10 19:00 +03:00", "%Y-%m-%d %H:%M %z"))
+        self.assertEqual(slot.description, "the description of slot new new")
+        self.assertEqual(slot.cost, 123456)
+
+        # delete
+        slot_id = slot.pk
+        old_slot_count = Slot.objects.count()
+        self.check_delete_simple(f"/slots/100500", 404)
+        self.check_delete_simple(f"/slots/{slot_id}", 204)
+        new_slot_count = Slot.objects.count()
+        self.assertEqual(new_slot_count + 1, old_slot_count)
+        self.assertEqual(Slot.objects.filter(pk=slot_id).first(), None)

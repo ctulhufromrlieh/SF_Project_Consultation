@@ -75,9 +75,13 @@ class SlotOneView(RetrieveUpdateDestroyAPIView):
         return get_slot_queryset(self.request)    
     
     def get_serializer(self, *args, **kwargs):
+        #
+        kwargs.setdefault('context', self.get_serializer_context())
+
         if self.request.method == "GET":
             return SlotSerializerRead(*args, **kwargs)
         elif self.request.method == "PUT":
+            # print("get_serializer: PUT")
             return SlotSerializerWrite(*args, **kwargs)
         elif self.request.method == "PATCH":
             return SlotSerializerWrite(*args, **kwargs)        
@@ -85,6 +89,15 @@ class SlotOneView(RetrieveUpdateDestroyAPIView):
             return SlotSerializerWrite(*args, **kwargs)
         else:
             raise Exception("SlotOneView.get_serializer_class: Wrong self.request.method")
+
+    def get_serializer_context(self):
+        # print("get_serializer_context")
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        context.update({"instance": self.get_object()})
+        # print("get_serializer_context:")
+        # print(context)
+        return context
 
 @api_view(["POST",])
 @permission_classes([SpecialistPermission])
