@@ -333,7 +333,7 @@ def create_example_database_only_users_1():
     # Admins
     Admin.objects.all().delete()
 
-    create_admin(name="ГлавАдмин", username="admin1", email="admin1@admins.aa", password="admin11psw")
+    create_admin(name="ГлавАдмин", username="admin1", email="admin1@admins.aa", password="admin1psw")
     create_admin(name="Почти главный админ", username="admin2", email="admin2@admins.bb", password="admin2psw")
 
 def create_example_database_1():

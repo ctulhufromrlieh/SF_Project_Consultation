@@ -40,6 +40,20 @@ class SpecialistView(RetrieveAPIView):
     serializer_class = ForAdminSpecialistSerializer
     permission_classes = [AdminPermission]
 
+class SlotActionListView(ListAPIView):
+    serializer_class = ForAdminSlotActionSerializer
+    permission_classes = [AdminPermission]
+
+    def get_queryset(self):
+        return SlotAction.objects.all()
+    
+class SlotActionOneView(RetrieveAPIView):
+    serializer_class = ForAdminSlotActionSerializer
+    permission_classes = [AdminPermission]
+
+    def get_queryset(self):
+        return SlotAction.objects.all()
+
 # Create your views here.
 def change_user_active(request, user, active):
     if request.method == "POST":
@@ -50,34 +64,42 @@ def change_user_active(request, user, active):
         #         })
         
 
-        user_obj = User.objects.all().filter(user=user)
+        # print(f"user: {user}")
+
+        user_obj = User.objects.filter(pk=user).first()
         if not user_obj:
             return Response({
-                "status": 400,
                 "error": "Wrong user id"
-                })
+                }, 400)
 
         if user_obj.is_active == active:
             if user_obj.is_active:
                 return Response({
-                    "status": 400,
                     "error": "User already activated"
-                    })
+                    }, 400)
             else:
                 return Response({
-                    "status": 400,
                     "error": "User already deactivated"
-                    })
+                    }, 400)
 
         user_obj.is_active = active
         user_obj.save()
+
+        if active:
+            return Response({
+                "success": "You successfully activate user"
+                }, 200)
+        else:
+            return Response({
+                "success": "You successfully deactivate user"
+                }, 200)
         
 @api_view(["POST",])
 @permission_classes([AdminPermission])
 def user_activate(request, user):
-    change_user_active(request, user, True)
+    return change_user_active(request, user, True)
 
 @api_view(["POST",])
 @permission_classes([AdminPermission])
 def user_deactivate(request, user):
-    change_user_active(request, user, False)
+    return change_user_active(request, user, False)

@@ -10,7 +10,7 @@ from main.models import Client, Specialist, Slot, SlotStatusActionType, ReasonTy
 # from main.serializers import SpecialistSerializer, SlotSerializer
 from main.utils import to_int, is_datetimes_intersect
 
-from .serializers import SpecialistSerializer, SlotSerializer
+from .serializers import SpecialistSerializer, SlotSerializer, ForClientSlotActionSerializer
 from .querysets import get_slot_queryset
 from .permissions import ClientPermission
 
@@ -40,6 +40,26 @@ class SlotOneView(RetrieveAPIView):
 
     def get_queryset(self):
         return get_slot_queryset(self.request, True)
+    
+class SlotActionListView(ListAPIView):
+    serializer_class = ForClientSlotActionSerializer
+    permission_classes = [ClientPermission]
+
+    def get_queryset(self):
+        try:
+            return SlotAction.objects.filter(client=self.request.user.client)
+        except:
+            return SlotAction.objects.none()
+    
+class SlotActionOneView(RetrieveAPIView):
+    serializer_class = ForClientSlotActionSerializer
+    permission_classes = [ClientPermission]
+
+    def get_queryset(self):
+        try:
+            return SlotAction.objects.filter(client=self.request.user.client)
+        except:
+            return SlotAction.objects.none()
 
 @api_view(["POST",])
 @permission_classes([ClientPermission])

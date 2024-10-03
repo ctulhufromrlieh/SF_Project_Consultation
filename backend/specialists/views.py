@@ -13,7 +13,7 @@ from main.models import Client, Specialist, Slot, SlotAction, SlotStatusActionTy
 from main.utils import to_int, is_datetimes_intersect
 from .querysets import get_slot_queryset
 from .permissions import SpecialistPermission
-from .serializers import SlotSerializerRead, SlotSerializerWrite
+from .serializers import SlotSerializerRead, SlotSerializerWrite, ForSpecialistSlotActionSerializer
 
 
 # import main.models
@@ -98,6 +98,49 @@ class SlotOneView(RetrieveUpdateDestroyAPIView):
         # print("get_serializer_context:")
         # print(context)
         return context
+    
+class SlotActionListView(ListAPIView):
+    serializer_class = ForSpecialistSlotActionSerializer
+    permission_classes = [SpecialistPermission]
+
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     if user:
+    #         specialist = user.specialist
+    #     else:
+    #         specialist = None
+
+    #     if specialist:
+    #         return SlotAction.objects.filter(slot__specialist=specialist)
+    #     else:
+    #         return SlotAction.objects.none()
+    def get_queryset(self):
+        try:
+            return SlotAction.objects.filter(slot__specialist=self.request.user.specialist)
+        except:
+            return SlotAction.objects.none()
+    
+class SlotActionOneView(RetrieveAPIView):
+    serializer_class = ForSpecialistSlotActionSerializer
+    permission_classes = [SpecialistPermission]
+
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     if user:
+    #         specialist = user.specialist
+    #     else:
+    #         specialist = None
+
+    #     if specialist:
+    #         return SlotAction.objects.filter(slot__specialist=specialist)
+    #     else:
+    #         return SlotAction.objects.none()
+
+    def get_queryset(self):
+        try:
+            return SlotAction.objects.filter(slot__specialist=self.request.user.specialist)
+        except:
+            return SlotAction.objects.none()
 
 @api_view(["POST",])
 @permission_classes([SpecialistPermission])
@@ -144,9 +187,8 @@ def accept_slot(request, slot=-1):
                                                 reason_type=None, comment="" )
 
         return Response({
-            "status": 200,
             "success": "You successfully accept slot"
-            })
+            }, 200)
 
 @api_view(["POST",])
 @permission_classes([SpecialistPermission])
@@ -192,6 +234,5 @@ def decline_slot(request, slot=-1):
                                                 reason_type=None, comment="" )
 
         return Response({
-            "status": 200,
             "success": "You successfully decline slot"
-            })
+            }, 200)

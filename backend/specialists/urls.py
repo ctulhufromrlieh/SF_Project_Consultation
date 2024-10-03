@@ -26,4 +26,6 @@ urlpatterns = [
     path('slots/<int:pk>', SlotOneView.as_view(), name='api_specialists_slot_one'),
     path('slots/accept/<int:slot>', accept_slot, name='api_specialists_accept_slot'),
     path('slots/decline/<int:slot>', decline_slot, name='api_specialists_decline_slot'),    
+    path('slot_actions', SlotActionListView.as_view(), name='api_specialists_slot_actions_list'),
+    path('slot_actions/<int:pk>', SlotActionOneView.as_view(), name='api_specialists_slot_action_one'),
 ]
