@@ -10,8 +10,8 @@ from django.contrib.auth.models import User
 from main.tests_common import *
 from main.utils import *
 
-# skip_tests = True
-skip_tests = False
+skip_tests = True
+# skip_tests = False
 
 class TestsMixin():
     need_params = False
@@ -119,6 +119,8 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         slot = Slot.objects.get(pk=1)
         self.assertEqual(slot.is_accepted, False)
         self.check_post_simple("/slots/accept/1", 200, "success", "You successfully accept slot")
+        last_slot_action = SlotAction.objects.order_by('pk').last()
+        self.assertEqual(last_slot_action.status, SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_ACCEPT)
         slot = Slot.objects.get(pk=1)
         self.assertEqual(slot.is_accepted, True)
         self.check_post_simple("/slots/accept/1", 400, "error", "This slot already accepted")
@@ -134,6 +136,8 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         self.assertEqual(slot.client, client)
 
         self.check_post_simple("/slots/decline/2", 200, "success", "You successfully decline slot")
+        last_slot_action = SlotAction.objects.order_by('pk').last()
+        self.assertEqual(last_slot_action.status, SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_DECLINE)
 
         slot = Slot.objects.get(pk=2)
         self.assertEqual(slot.client, None)

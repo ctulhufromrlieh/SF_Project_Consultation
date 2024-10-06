@@ -27,8 +27,8 @@ urlpatterns = [
     path('clients/<int:pk>', ClientView.as_view(), name='api_admins_client_one'),
     path('specialists', SpecialistListView.as_view(), name='api_admins_specialist_list'),
     path('specialists/<int:pk>', SpecialistView.as_view(), name='api_admins_specialist_one'),
-    path('user_activate/<int:user>', user_activate, name='api_admins_user_activate'),
-    path('user_deactivate/<int:user>', user_deactivate, name='api_admins_user_deactivate'),
+    path('users/activate/<int:user>', user_activate, name='api_admins_user_activate'),
+    path('users/deactivate/<int:user>', user_deactivate, name='api_admins_user_deactivate'),
     path('slot_actions', SlotActionListView.as_view(), name='api_admins_slot_actions_list'),
     path('slot_actions/<int:pk>', SlotActionOneView.as_view(), name='api_admins_slot_action_one'),    
 ]

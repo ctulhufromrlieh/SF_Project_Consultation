@@ -42,6 +42,14 @@ class BaseTest(APITestCase):
             return None
 
     @staticmethod
+    def is_users_equal(obj, dict):
+        return (
+            (obj.pk == dict["id"]) and
+            (obj.username == dict["username"]) and
+            (get_user_type_caption(obj) == dict["user_type_caption"])
+        )
+
+    @staticmethod
     def is_clients_equal(obj, dict):
         return (
             (obj.pk == dict["id"]) and

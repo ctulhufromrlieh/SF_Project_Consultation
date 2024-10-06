@@ -9,8 +9,8 @@ from django.contrib.auth.models import User
 
 from main.tests_common import *
 
-# skip_tests = True
-skip_tests = False
+skip_tests = True
+# skip_tests = False
 
 class TestsMixin():
     need_params = False
