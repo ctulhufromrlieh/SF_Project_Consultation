@@ -57,16 +57,19 @@ class SlotSerializerWrite(serializers.ModelSerializer):
         datetime1 = data["datetime1"]
         datetime2 = data["datetime2"]
 
-        specialist_slots = Slot.objects.all().filter(specialist=user.specialist)
-        if instance:
-            specialist_slots = specialist_slots.exclude(pk=instance.pk)
-        for curr_slot in specialist_slots:
-            curr_datetime_1 = curr_slot.datetime1
-            curr_datetime_2 = curr_slot.datetime2
-            
-            if (is_datetimes_intersect(datetime1, datetime2, curr_datetime_1, curr_datetime_2)):
-                errors["datetime1, datetime2"] = "New slot and old slots intersects!"
-                break
+        if datetime1 >= datetime2:
+            errors["datetime1, datetime2"] = "Datetime2 should be greater then Datetime1!"
+        else:
+            specialist_slots = Slot.objects.all().filter(specialist=user.specialist)
+            if instance:
+                specialist_slots = specialist_slots.exclude(pk=instance.pk)
+            for curr_slot in specialist_slots:
+                curr_datetime_1 = curr_slot.datetime1
+                curr_datetime_2 = curr_slot.datetime2
+                
+                if (is_datetimes_intersect(datetime1, datetime2, curr_datetime_1, curr_datetime_2)):
+                    errors["datetime1, datetime2"] = "New slot and old slots intersects!"
+                    break
 
         if errors:
             raise serializers.ValidationError(errors)
@@ -74,7 +77,7 @@ class SlotSerializerWrite(serializers.ModelSerializer):
         return data
 
 class ForSpecialistSlotActionSerializer(serializers.ModelSerializer):
-    client__name = serializers.CharField(source='client.name')
+    client__name = serializers.CharField(source='client.name', required=False, allow_null=True,)
     slot__specialist = serializers.CharField(source='slot.specialist')
     slot__specialist__name = serializers.CharField(source='slot.specialist.name', required=False, allow_null=True,)
     # slot__type = serializers.IntegerField(source='slot.type')

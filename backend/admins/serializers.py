@@ -25,7 +25,7 @@ class ForAdminSpecialistSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 class ForAdminSlotActionSerializer(serializers.ModelSerializer):
-    client__name = serializers.CharField(source='client.name')
+    client__name = serializers.CharField(source='client.name', required=False, allow_null=True,)
     slot__specialist = serializers.CharField(source='slot.specialist')
     slot__specialist__name = serializers.CharField(source='slot.specialist.name', required=False, allow_null=True,)
     # slot__type = serializers.IntegerField(source='slot.type')

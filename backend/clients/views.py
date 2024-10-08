@@ -1,16 +1,22 @@
 import datetime
+from drf_yasg import openapi
+
 from django.shortcuts import render
 
 from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework import permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, schema
 from rest_framework.response import Response
+
+import coreapi, coreschema
+from rest_framework.schemas import AutoSchema, ManualSchema
+from drf_yasg.utils import swagger_auto_schema
 
 from main.models import Client, Specialist, Slot, SlotStatusActionType, ReasonType, SlotAction
 # from main.serializers import SpecialistSerializer, SlotSerializer
 from main.utils import to_int, is_datetimes_intersect
 
-from .serializers import SpecialistSerializer, SlotSerializer, ForClientSlotActionSerializer
+from .serializers import SpecialistSerializer, SlotSerializer, ForClientSlotActionSerializer, UnsignSlotActionSerializer
 from .querysets import get_slot_queryset
 from .permissions import ClientPermission
 
@@ -116,10 +122,42 @@ def sign_to_slot(request, slot=-1):
             "success": "You successfully signed to slot"
             })
 
+# unsign_from_slot_schema = AutoSchema(manual_fields=[
+#     coreapi.Field("reason_type", required=True, location="form", type="string", description="Reason for unsigning"),
+#     coreapi.Field("comment", required=True, location="form", type="string", description="Comment for unsigning")
+# ])
+
+# @swagger_auto_schema(method='POST', request_body=UnsignSlotActionSerializer)
+@swagger_auto_schema(method='POST', request_body=UnsignSlotActionSerializer)
 @api_view(["POST",])
+# @api_view(["POST",])
+# @swagger_auto_schema(method='post', request_body=openapi.Schema(
+#         type=openapi.TYPE_OBJECT,
+#         properties={
+#                 'SlotAction': openapi.Schema(
+#                         type=openapi.TYPE_OBJECT,
+#                         properties={
+#                                 'reason_type': openapi.Schema(type=openapi.TYPE_INTEGER, description='reason type'),
+#                                 'comment': openapi.Schema(type=openapi.TYPE_STRING, description='comment'),
+#                         }
+#                 )
+#         }
+# ))
+# @api_view(["POST",])
 @permission_classes([ClientPermission])
+# @schema(unsign_from_slot_schema)
+# @swagger_auto_schema(method='POST', request_body=UnsignSlotActionSerializer)
+# @swagger_auto_schema(request_body=UnsignSlotActionSerializer)
+# @swagger_auto_schema(method='POST', request_body=openapi.Scheme())
+# @swagger_auto_schema(request_body=openapi.Scheme())
 def unsign_from_slot(request, slot):
+    # raise Exception('unsign_from_slot exception!')
+
     if request.method == "POST":
+        # print(f"unsign: reason_type: {reason_type} and comment: {comment}")
+        # print("request.POST:")
+        # print(list(request.POST))
+        # print(request.data)
         user = request.user
 
         if slot:
@@ -145,15 +183,21 @@ def unsign_from_slot(request, slot):
         
         reason_type = request.POST.get('reason_type', -1)
         comment = request.POST.get('comment', "")
+        # reason_type = request.data.get('reason_type', -1)
+        # comment = request.data.get('comment', "")
         # print(f"cancel_type from request: {cancel_type}")
         reason_type_obj = ReasonType.objects.filter(pk=reason_type).first()
         if not reason_type_obj:
             reason_type = -1
 
+        # print(f"unsign: reason_type: {reason_type} and comment: {comment}")
+
         if (reason_type == -1) and (not comment):
             return Response({
                 "error": "You should set valid Reason Type or set non-empty comment"
                 }, 400)
+        
+        # print(f"unsign: reason_type: {reason_type} and comment: {comment}")
             
         slot_obj.client = None
         slot_obj.is_accepted = False

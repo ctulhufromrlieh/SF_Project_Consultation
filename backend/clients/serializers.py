@@ -30,7 +30,7 @@ class SlotSerializer(serializers.ModelSerializer):
                  )
         
 class ForClientSlotActionSerializer(serializers.ModelSerializer):
-    client__name = serializers.CharField(source='client.name')
+    client__name = serializers.CharField(source='client.name', required=False, allow_null=True,)
     slot__specialist = serializers.CharField(source='slot.specialist')
     slot__specialist__name = serializers.CharField(source='slot.specialist.name', required=False, allow_null=True,)
     # slot__type = serializers.IntegerField(source='slot.type')
@@ -60,3 +60,15 @@ class ForClientSlotActionSerializer(serializers.ModelSerializer):
     comment = models.TextField(default="", help_text="Status action comment", null=True, blank=True)
     datetime = models.DateTimeField(help_text="Datetime of event")        
     
+
+class UnsignSlotActionSerializer(serializers.ModelSerializer):
+    def update(self, instance, validated_data):
+        print("update:")
+        print(validated_data)
+        super().update(instance, validated_data)
+
+    class Meta:
+        model = SlotAction
+        fields = ('id', 'reason_type', 'comment',
+                 )
+        

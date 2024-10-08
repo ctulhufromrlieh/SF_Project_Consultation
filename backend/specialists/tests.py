@@ -10,8 +10,8 @@ from django.contrib.auth.models import User
 from main.tests_common import *
 from main.utils import *
 
-skip_tests = True
-# skip_tests = False
+# skip_tests = True
+skip_tests = False
 
 class TestsMixin():
     need_params = False
@@ -84,7 +84,7 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         # print(self.myclient)
 
     def atest_slot_list(self):
-        slots_b = Slot.objects.filter(specialist=self.myspec)
+        slots_b = Slot.objects.exclude(is_deleted=True).filter(specialist=self.myspec)
 
         resp_result = self.get_simple("/slots")
         slots_r = resp_result["data"]
@@ -98,7 +98,7 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
             self.assertTrue(self.is_slots_equal(curr_slot_b, curr_slot_r))
 
     def atest_slot_one(self):
-        slots_b = Slot.objects.filter(specialist=self.myspec)
+        slots_b = Slot.objects.exclude(is_deleted=True).filter(specialist=self.myspec)
 
         for curr_slot_b in slots_b:
             resp_result = self.get_simple(f"/slots/{curr_slot_b.pk}")
@@ -145,7 +145,7 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         self.check_post_simple("/slots/decline/2", 400, "error", "Client is not assigned yet")
 
     def test_create_update_delete(self):
-        self.assertEqual(Slot.objects.count(), 6)
+        self.assertEqual(Slot.objects.exclude(is_deleted=True).count(), 6)
 
         self.check_post_simple("/slots", 400, "", "")
 
@@ -235,9 +235,10 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
 
         # delete
         slot_id = slot.pk
-        old_slot_count = Slot.objects.count()
+        old_slot_count = Slot.objects.exclude(is_deleted=True).count()
         self.check_delete_simple(f"/slots/100500", 404)
         self.check_delete_simple(f"/slots/{slot_id}", 204)
-        new_slot_count = Slot.objects.count()
+        new_slot_count = Slot.objects.exclude(is_deleted=True).count()
         self.assertEqual(new_slot_count + 1, old_slot_count)
-        self.assertEqual(Slot.objects.filter(pk=slot_id).first(), None)
+        self.assertEqual(Slot.objects.exclude(is_deleted=True).filter(pk=slot_id).first(), None)
+

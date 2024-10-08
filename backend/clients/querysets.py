@@ -17,7 +17,7 @@ def get_slot_queryset(request, is_only_available=True):
 
     specialist_id = to_int(request.GET.get('specialist', ''), -1)
 
-    res = Slot.objects.all()
+    res = Slot.objects.all().exclude(is_deleted=True)
 
     if not (specialist_id == -1):
         res = res.filter(specialist=specialist_id)

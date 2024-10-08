@@ -9,8 +9,8 @@ from django.contrib.auth.models import User
 
 from main.tests_common import *
 
-skip_tests = True
-# skip_tests = False
+# skip_tests = True
+skip_tests = False
 
 class TestsMixin():
     need_params = False
@@ -109,7 +109,7 @@ class ClientTests(TestsMixin, SuccessBaseTest):
             self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
 
     def atest_slot_list(self):
-        slots_b = Slot.objects.filter(Q(client=None) | Q(client=self.myclient))
+        slots_b = Slot.objects.exclude(is_deleted=True).filter(Q(client=None) | Q(client=self.myclient))
 
         resp_result = self.get_simple("/slots")
         slots_r = resp_result["data"]
@@ -124,7 +124,7 @@ class ClientTests(TestsMixin, SuccessBaseTest):
             self.assertTrue(self.is_slots_equal(curr_slot_b, curr_slot_r))
 
     def atest_slot_one(self):
-        slots_b = Slot.objects.filter(client=self.myclient)
+        slots_b = Slot.objects.exclude(is_deleted=True).filter(client=self.myclient)
 
         for curr_slot_b in slots_b:
             resp_result = self.get_simple(f"/slots/{curr_slot_b.pk}")
@@ -156,7 +156,7 @@ class ClientTests(TestsMixin, SuccessBaseTest):
         self.check_post_simple("/slots/sign/3", 400, "error", "This slot already used by you")
 
         # unsign
-        self.check_post_simple("/slots/unsign/", 404, "", "")
+        self.check_post_simple("/slots/unsign/", 404, "", "", )
         self.check_post_simple("/slots/unsign/100500", 400, "error", "Slot with such id not exists")
         self.check_post_simple("/slots/unsign/2", 400, "error", "You are not signed to this slot")
         self.check_post_simple("/slots/unsign/1", 400, "error", "You should set valid Reason Type or set non-empty comment")

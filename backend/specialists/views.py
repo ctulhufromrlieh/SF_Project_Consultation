@@ -94,10 +94,18 @@ class SlotOneView(RetrieveUpdateDestroyAPIView):
         # print("get_serializer_context")
         context = super().get_serializer_context()
         context.update({"request": self.request})
-        context.update({"instance": self.get_object()})
+        try:
+            context.update({"instance": self.get_object()})
+        except:
+            context.update({"instance": None})
         # print("get_serializer_context:")
         # print(context)
         return context
+    
+    def perform_destroy(self, instance):
+        # instance.delete()
+        instance.is_deleted = True
+        instance.save()
     
 class SlotActionListView(ListAPIView):
     serializer_class = ForSpecialistSlotActionSerializer
