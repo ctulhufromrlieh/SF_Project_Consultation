@@ -25,38 +25,6 @@ def get_user_type_caption(user):
     else:
         return ""
 
-# def get_user_type_caption(user):
-#     if Client.is_own(user):
-#         return "Client"
-#     elif Specialist.is_own(user):
-#         return "Specialist"
-#     elif user and user.is_staff:
-#         return "Admin"
-#     else:
-#         return "Anonymous"
-
-# def get_user_type_caption(user):
-#     if Client.is_own(user):
-#         return "Client"
-#     elif Specialist.is_own(user):
-#         return "Specialist"
-#     # elif user and user.is_staff:
-#     elif Admin.is_own(user):
-#         return "Admin"
-#     else:
-#         return "Anonymous"
-    
-# def get_user_type_caption(user):
-#     if Client.is_own(user):
-#         return "Client"
-#     elif Specialist.is_own(user):
-#         return "Specialist"
-#     # elif user and user.is_staff:
-#     elif Admin.is_own(user):
-#         return "Admin"
-#     else:
-#         return "Anonymous"
-
 def str_to_datetime(str, tz_str=""):
     if tz_str:
         return datetime.strptime(f"{str} {tz_str}", "%Y-%m-%d %H:%M:%S %z")

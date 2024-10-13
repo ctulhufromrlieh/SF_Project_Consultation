@@ -1,9 +1,4 @@
-import json
 import unittest
-
-from django.test import TestCase
-from rest_framework.test import APIRequestFactory, RequestsClient, APITestCase, APIClient
-
 from django.db.models import Q
 from django.contrib.auth.models import User
 
@@ -97,7 +92,6 @@ class ClientTests(TestsMixin, SuccessBaseTest):
             self.assertTrue(self.is_users_equal(curr_spec_b, curr_spec_r))
     
     def atest_specialist_one(self):
-        # ids = [3, 4]
         ids = [4, 5]
         for curr_id in ids:
             curr_loc_url = f"/specialists/{curr_id}"

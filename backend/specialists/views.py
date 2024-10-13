@@ -1,35 +1,16 @@
 import datetime
-# import serializers
-from django.shortcuts import render
-from django.http import HttpResponseBadRequest
 
-from rest_framework.generics import ListAPIView, CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, UpdateAPIView, RetrieveAPIView
-from rest_framework import permissions
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-# from main.models import Client, Specialist, Slot, SlotAction, SlotStatusActionType
 from main.models import Slot, SlotAction, SlotStatusActionType
-# from main.serializers import SpecialistSerializer, SlotSerializer, SlotUpdateSerializer
-from main.utils import to_int, is_datetimes_intersect
-from .querysets import get_slot_queryset
 from .permissions import *
 from .serializers import SlotSerializerRead, SlotSerializerWrite, ForSpecialistSlotActionSerializer
-from main.permissions import CodeNamePermission
-
-
-# import main.models
-# import main.serializers
-# from main import models
-# import querysets
 
 # Create your views here.
 
 class SlotListView(ListCreateAPIView):
-    # queryset = Slot.objects.all()
-    # serializer_class = SlotSerializerRead
-    # permission_classes = [SpecialistPermission]
-    # permission_classes = [CodeNamePermission('specialists.view_slot')]
     permission_classes = [SlotListViewPermission]
 
     def get_queryset(self):
@@ -39,9 +20,6 @@ class SlotListView(ListCreateAPIView):
         
         return Slot.objects.all().exclude(is_deleted=True).filter(specialist=user)
         
-    # def get_queryset(self):        
-        # return get_slot_queryset(self.request)
-    
     def get_serializer(self, *args, **kwargs):
         kwargs["context"] = self.get_serializer_context()
         if self.request.method == "GET":
@@ -54,27 +32,15 @@ class SlotListView(ListCreateAPIView):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({"request": self.request})
-        # print("get_serializer_context:")
-        # print(context)
         return context
 
     def perform_create(self, serializer):
-        # super().perform_create(serializer)
-        # raise ValueError("123456")
-        # raise HttpResponseBadRequest("qwerty")
-        # serializer.save(specialist=self.request.user.specialist)
         serializer.save(specialist=self.request.user)
 
 class SlotOneView(RetrieveUpdateDestroyAPIView):
-    # queryset = Slot.objects.all()
     serializer_class = SlotSerializerWrite
-    # permission_classes = [SpecialistPermission]
-    # permission_classes = [CodeNamePermission('specialists.view_slot')]
     permission_classes = [SlotOneViewPermission]
-    
-    # def get_queryset(self):
-    #     return get_slot_queryset(self.request)    
-    
+
     def get_queryset(self):
         user = self.request.user
         if not user.groups.filter(name="specialists").exists():
@@ -89,7 +55,6 @@ class SlotOneView(RetrieveUpdateDestroyAPIView):
         if self.request.method == "GET":
             return SlotSerializerRead(*args, **kwargs)
         elif self.request.method == "PUT":
-            # print("get_serializer: PUT")
             return SlotSerializerWrite(*args, **kwargs)
         elif self.request.method == "PATCH":
             return SlotSerializerWrite(*args, **kwargs)        
@@ -99,39 +64,23 @@ class SlotOneView(RetrieveUpdateDestroyAPIView):
             raise Exception("SlotOneView.get_serializer_class: Wrong self.request.method")
 
     def get_serializer_context(self):
-        # print("get_serializer_context")
         context = super().get_serializer_context()
         context.update({"request": self.request})
         try:
             context.update({"instance": self.get_object()})
         except:
             context.update({"instance": None})
-        # print("get_serializer_context:")
-        # print(context)
+
         return context
     
     def perform_destroy(self, instance):
-        # instance.delete()
         instance.is_deleted = True
         instance.save()
     
 class SlotActionListView(ListAPIView):
     serializer_class = ForSpecialistSlotActionSerializer
-    # permission_classes = [SpecialistPermission]
-    # permission_classes = [CodeNamePermission('specialists.view_slot_action')]
     permission_classes = [ViewSlotActionPermission]
 
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     if user:
-    #         specialist = user.specialist
-    #     else:
-    #         specialist = None
-
-    #     if specialist:
-    #         return SlotAction.objects.filter(slot__specialist=specialist)
-    #     else:
-    #         return SlotAction.objects.none()
     def get_queryset(self):
         try:
             return SlotAction.objects.filter(slot__specialist=self.request.user.specialist)
@@ -140,21 +89,7 @@ class SlotActionListView(ListAPIView):
     
 class SlotActionOneView(RetrieveAPIView):
     serializer_class = ForSpecialistSlotActionSerializer
-    # permission_classes = [SpecialistPermission]
-    # permission_classes = [CodeNamePermission('specialists.view_slot_action')]
     permission_classes = [ViewSlotActionPermission]
-
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     if user:
-    #         specialist = user.specialist
-    #     else:
-    #         specialist = None
-
-    #     if specialist:
-    #         return SlotAction.objects.filter(slot__specialist=specialist)
-    #     else:
-    #         return SlotAction.objects.none()
 
     def get_queryset(self):
         try:
@@ -163,8 +98,6 @@ class SlotActionOneView(RetrieveAPIView):
             return SlotAction.objects.none()
 
 @api_view(["POST",])
-# @permission_classes([SpecialistPermission])
-# @permission_classes([CodeNamePermission('specialists.accept_slot')])
 @permission_classes([AcceptSlotActionPermission])
 def accept_slot(request, slot=-1):
     if request.method == "POST":
@@ -186,7 +119,6 @@ def accept_slot(request, slot=-1):
                 "error": "Slot with such id not exists"
                 }, 400)
         
-        # if slot_obj.specialist.user != user:
         if slot_obj.specialist != user:
             return Response({
                 "error": "It is not your slot"
@@ -214,8 +146,6 @@ def accept_slot(request, slot=-1):
             }, 200)
 
 @api_view(["POST",])
-# @permission_classes([SpecialistPermission])
-# @permission_classes([CodeNamePermission('specialists.decline_slot')])
 @permission_classes([DeclineSlotActionPermission])
 def decline_slot(request, slot=-1):
     if request.method == "POST":
@@ -237,7 +167,6 @@ def decline_slot(request, slot=-1):
                 "error": "Slot with such id not exists"
                 }, 400)
         
-        # if slot_obj.specialist.user != user:
         if slot_obj.specialist != user:
             return Response({
                 "error": "It is not your slot"
@@ -252,8 +181,6 @@ def decline_slot(request, slot=-1):
 
         slot_obj.client = None
         slot_obj.save()
-
-        # print(f"client={client}")
 
         slot_action = SlotAction.objects.create(client=client, slot=slot_obj, datetime=datetime.datetime.now(datetime.timezone.utc),
                                                 status=SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_DECLINE, 

@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'main',
-    'accounts',
     'admins',
     'clients',
     'specialists',
@@ -142,11 +141,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-# VENV_PATH = os.path.dirname(BASE_DIR)
-# STATIC_ROOT = os.path.join(VENV_PATH, 'static_root')
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -165,68 +159,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
-
-# SWAGGER_SETTINGS = {
-#     'SECURITY_DEFINITIONS': {
-#         'Bearer': {
-#             'type': 'apiKey',
-#             'name': 'Authorization',
-#             'in': 'header'
-#         }
-#     }
-# }
-
-# SWAGGER_SETTINGS = {
-#     "USE_SESSION_AUTH": True,
-#     "SECURITY_DEFINITIONS": {
-#         "Basic": {"type": "basic"},
-#         "api_key": {"type": "apiKey", "name": "authorization", "in": "header"},
-#     },
-#     "REFETCH_SCHEMA_WITH_AUTH": True,
-# }
-
-# SWAGGER_SETTINGS = {
-#    'SECURITY_DEFINITIONS': {
-#         'Token': {
-#             'type': 'apiKey',
-#             # 'type': 'basic',
-#             ;
-#             'name': 'Authorization',
-#             'in': 'header'
-#         }
-#     }
-# }
-
-# SWAGGER_SETTINGS = {
-#     'SECURITY_DEFINITIONS': {
-#         'DRF Token': {
-#             'type': 'apiKey',
-#             'name': 'Authorization',
-#             'in': 'header'
-#         },
-#     },
-#     "REFETCH_SCHEMA_WITH_AUTH": True,    
-# }
-
-# SWAGGER_SETTINGS = {
-#    'SECURITY_DEFINITIONS': {
-#         'Bearer': {
-#             'type': 'apiKey',
-#             'name': 'Authorization',
-#             'in': 'header'
-#         }
-#     }
-# }
-
-# SWAGGER_SETTINGS = {
-#     'SECURITY_DEFINITIONS': {
-#         'api_key': {
-#             'type': 'apiKey',
-#             'name': 'HTTP_AUTHORIZATION',
-#             'in': 'header'
-#         }
-#     }
-# }
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {

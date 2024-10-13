@@ -1,6 +1,5 @@
 from rest_framework import permissions
 
-# from main.models import Specialist
 from main.permissions import CodeNamePermission
 
 class SlotListViewPermission(permissions.BasePermission):
@@ -33,36 +32,3 @@ class AcceptSlotActionPermission(CodeNamePermission):
 
 class DeclineSlotActionPermission(CodeNamePermission):
     codename = "specialists.decline_slot"
-
-# class SpecialistPermission(permissions.BasePermission):
-#     def has_permission(self, request, view):
-#         # if Client.is_own(request.user):
-#         if request.user.groups.filter(name="specialists").exists():
-#             # return True
-#             return request.user.is_active
-#         else:
-#             return False
-
-#     def has_object_permission(self, request, view, obj):
-#         # return False
-#         # if Client.is_own(request.user):
-#         if request.user.groups.filter(name="specialists").exists():
-#             # return True
-#             return request.user.is_active
-#         else:
-#             return False
-
-#     # def has_permission(self, request, view):
-#     #     if Specialist.is_own(request.user):
-#     #         # return True
-#     #         return request.user.is_active
-#     #     else:
-#     #         return False
-
-#     # def has_object_permission(self, request, view, obj):
-#     #     # return False
-#     #     if Specialist.is_own(request.user):
-#     #         # return True
-#     #         return request.user.is_active
-#     #     else:
-#     #         return False

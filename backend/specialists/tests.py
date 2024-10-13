@@ -1,10 +1,4 @@
-import json
 import unittest
-
-from django.test import TestCase
-from rest_framework.test import APIRequestFactory, RequestsClient, APITestCase, APIClient
-
-from django.db.models import Q
 from django.contrib.auth.models import User
 
 from main.tests_common import *
@@ -124,7 +118,6 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         self.check_post_simple("/slots/decline/3", 400, "error", "Client is not assigned yet")
 
         slot = Slot.objects.get(pk=2)
-        # client = User.objects.filter(groups__name='clients').get(pk=2)
         client = User.objects.filter(groups__name='clients').get(pk=3)
         self.assertEqual(slot.client, client)
 

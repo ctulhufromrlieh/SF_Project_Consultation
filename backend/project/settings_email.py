@@ -4,4 +4,3 @@ EMAIL_HOST_PASSWORD = "qwertyuiopasdfghjkl"
 
 DEFAULT_FROM_EMAIL = "example@yandex.ru"
 SERVER_EMAIL = "example@yandex.ru"
-

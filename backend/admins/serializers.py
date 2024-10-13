@@ -8,30 +8,11 @@ from main.utils import *
 class ForAdminUserSerializer(serializers.ModelSerializer):
     user_type_caption = serializers.SerializerMethodField('user_type_caption_func')
     def user_type_caption_func(self, user):
-        # return get_user_type_caption(obj)   
         return get_user_type_caption(user)
-        # if user.groups.filter(name="clients").exists():
-        #     return "Client"
-        # elif user.groups.filter(name="specialists").exists():
-        #     return "Specialist"
-        # elif user.groups.filter(name="admins").exists():
-        #     return "Admin"
-        # else:
-        #     return ""
 
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'user_type_caption')
-
-# class ForAdminClientSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Client
-#         fields = ('id', 'name')
-
-# class ForAdminSpecialistSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Specialist
-#         fields = ('id', 'name')
 
 class ForAdminSlotActionSerializer(serializers.ModelSerializer):
     client__name = serializers.CharField(source='client.firts_name', required=False, allow_null=True,)
@@ -62,4 +43,5 @@ class ForAdminSlotActionSerializer(serializers.ModelSerializer):
     status = models.CharField(max_length=3, choices=SlotStatusActionType.choices, default=SlotStatusActionType.SLOT_STATUS_ACTION_NEW)
     reason_type = models.ForeignKey(ReasonType, on_delete=models.CASCADE, null=True, blank=True, default=None)
     comment = models.TextField(default="", help_text="Status action comment", null=True, blank=True)
-    datetime = models.DateTimeField(help_text="Datetime of event")   
+    datetime = models.DateTimeField(help_text="Datetime of event")
+    
