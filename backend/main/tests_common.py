@@ -345,7 +345,14 @@ def create_example_database_only_users_1():
     # group_specialists, created = Group.objects.get_or_create(name="specialists")
     # group_admins, created = Group.objects.get_or_create(name="admins")
 
-    User.objects.exclude(username="admin").delete()
+    # User.objects.exclude(username="admin").delete()
+    User.objects.all().delete()
+
+    # Superuser
+    user=User.objects.create_user('admin', password='admin')
+    user.is_superuser=True
+    user.is_staff=True
+    user.save()
 
     # Clients
     # Client.objects.all().delete()

@@ -110,56 +110,56 @@ class AdminTests(TestsMixin, SuccessBaseTest):
             self.assertEqual(curr_resp_result["status_code"], 200)
             self.assertTrue(self.is_users_equal(curr_user_b, curr_user_r))
 
-    def atest_specialist_list_a(self):
-        # specs_b = Specialist.objects.all()
-        specs_b = User.objects.filter(groups__name='specialists')
+    # def atest_specialist_list_a(self):
+    #     # specs_b = Specialist.objects.all()
+    #     specs_b = User.objects.filter(groups__name='specialists')
 
-        resp_result = self.get_simple("/specialists")
-        specs_r = resp_result["data"]
+    #     resp_result = self.get_simple("/specialists")
+    #     specs_r = resp_result["data"]
 
-        self.assertEqual(resp_result["status_code"], 200)
-        self.assertEqual(specs_b.count(), len(specs_r))
+    #     self.assertEqual(resp_result["status_code"], 200)
+    #     self.assertEqual(specs_b.count(), len(specs_r))
 
-        for i in range(len(specs_r)):
-            curr_spec_r = specs_r[i]
-            curr_spec_b = specs_b[i]
-            self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
+    #     for i in range(len(specs_r)):
+    #         curr_spec_r = specs_r[i]
+    #         curr_spec_b = specs_b[i]
+    #         self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
     
-    def atest_specialist_one_a(self):
-        ids = [1, 2]
-        for curr_id in ids:
-            curr_loc_url = f"/specialists/{curr_id}"
-            curr_resp_result = self.get_simple(curr_loc_url)
-            curr_spec_r = curr_resp_result["data"]
-            curr_spec_b = User.objects.filter(groups__name='specialists').get(pk=curr_id)
+    # def atest_specialist_one_a(self):
+    #     ids = [1, 2]
+    #     for curr_id in ids:
+    #         curr_loc_url = f"/specialists/{curr_id}"
+    #         curr_resp_result = self.get_simple(curr_loc_url)
+    #         curr_spec_r = curr_resp_result["data"]
+    #         curr_spec_b = User.objects.filter(groups__name='specialists').get(pk=curr_id)
 
-            self.assertEqual(curr_resp_result["status_code"], 200)
-            self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
+    #         self.assertEqual(curr_resp_result["status_code"], 200)
+    #         self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
 
-    def atest_client_list_a(self):
-        clients_b = User.objects.filter(groups__name='clients')
+    # def atest_client_list_a(self):
+    #     clients_b = User.objects.filter(groups__name='clients')
 
-        resp_result = self.get_simple("/clients")
-        clients_r = resp_result["data"]
+    #     resp_result = self.get_simple("/clients")
+    #     clients_r = resp_result["data"]
 
-        self.assertEqual(resp_result["status_code"], 200)
-        self.assertEqual(clients_b.count(), len(clients_r))
+    #     self.assertEqual(resp_result["status_code"], 200)
+    #     self.assertEqual(clients_b.count(), len(clients_r))
 
-        for i in range(len(clients_r)):
-            curr_client_r = clients_r[i]
-            curr_client_b = clients_b[i]
-            self.assertTrue(self.is_clients_equal(curr_client_b, curr_client_r))
+    #     for i in range(len(clients_r)):
+    #         curr_client_r = clients_r[i]
+    #         curr_client_b = clients_b[i]
+    #         self.assertTrue(self.is_clients_equal(curr_client_b, curr_client_r))
     
-    def atest_client_one_a(self):
-        ids = [1, 2]
-        for curr_id in ids:
-            curr_loc_url = f"/clients/{curr_id}"
-            curr_resp_result = self.get_simple(curr_loc_url)
-            curr_client_r = curr_resp_result["data"]
-            curr_client_b = User.objects.filter(groups__name='specialists').get(pk=curr_id)
+    # def atest_client_one_a(self):
+    #     ids = [1, 2]
+    #     for curr_id in ids:
+    #         curr_loc_url = f"/clients/{curr_id}"
+    #         curr_resp_result = self.get_simple(curr_loc_url)
+    #         curr_client_r = curr_resp_result["data"]
+    #         curr_client_b = User.objects.filter(groups__name='specialists').get(pk=curr_id)
 
-            self.assertEqual(resp_result["status_code"], 200)
-            self.assertTrue(self.is_clients_equal(curr_client_b, curr_client_r))
+    #         self.assertEqual(resp_result["status_code"], 200)
+    #         self.assertTrue(self.is_clients_equal(curr_client_b, curr_client_r))
 
     def test_get(self):
         self.atest_user_list_a()

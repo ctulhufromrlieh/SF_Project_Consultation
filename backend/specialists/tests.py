@@ -124,7 +124,8 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         self.check_post_simple("/slots/decline/3", 400, "error", "Client is not assigned yet")
 
         slot = Slot.objects.get(pk=2)
-        client = User.objects.filter(groups__name='clients').get(pk=2)
+        # client = User.objects.filter(groups__name='clients').get(pk=2)
+        client = User.objects.filter(groups__name='clients').get(pk=3)
         self.assertEqual(slot.client, client)
 
         self.check_post_simple("/slots/decline/2", 200, "success", "You successfully decline slot")

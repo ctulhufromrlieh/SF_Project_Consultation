@@ -26,7 +26,7 @@ class TestsMixin():
         self.check_get_status("/specialists")
     
     def atest_specialist_one_1(self):
-        self.check_get_status("/specialists/3")
+        self.check_get_status("/specialists/4")
 
     def atest_slot_list(self):
         self.check_get_status("/slots")
@@ -97,7 +97,8 @@ class ClientTests(TestsMixin, SuccessBaseTest):
             self.assertTrue(self.is_users_equal(curr_spec_b, curr_spec_r))
     
     def atest_specialist_one(self):
-        ids = [3, 4]
+        # ids = [3, 4]
+        ids = [4, 5]
         for curr_id in ids:
             curr_loc_url = f"/specialists/{curr_id}"
             curr_resp_result = self.get_simple(curr_loc_url)

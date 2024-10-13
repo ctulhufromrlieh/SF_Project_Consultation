@@ -6,6 +6,35 @@ from django.core.mail import mail_managers, EmailMultiAlternatives
 from .models import SlotAction, SlotStatusActionType
 # from .models import SchedulingMailData
 
+def send_email_about_new_user(user, group_name, password):
+    if group_name=="clients":
+        role_caption = "Клиент сервиса"
+    elif group_name=="specialists":
+        role_caption = "Специалист"
+    elif group_name=="admins":
+        role_caption = "Администратор"
+    else:
+        raise Exception("send_email_about_new_user: invalid user.groups")
+
+    text_content = (
+        f"Уважаемый {user.first_name}!\n"
+        f"Вы зарегистрированы на сервисе как {role_caption}!\n"
+        f"Логин: {user.username}\n"
+        f"Пароль: {password}"
+    )
+    html_content = (
+        f"Уважаемый {user.first_name}!<br>"
+        f"Вы зарегистрированы на сервисе как {role_caption}!<br>"
+        f"Логин: {user.username}\n"
+        f"Пароль: {password}"
+    ) 
+
+    subject = f"Регистрация"
+
+    msg = EmailMultiAlternatives(subject, text_content, None, [user.email])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
 def send_email_about_slot_action(slot_action):
     if slot_action.status == SlotStatusActionType.SLOT_STATUS_ACTION_NEW:
         # to_user = slot_action.slot.specialist.user
