@@ -9,50 +9,57 @@ from django.contrib.auth.models import User
 from .permissions import *
 from .serializers import *
 from main.models import *
+from main.permissions import CodeNamePermission
 
 class UserListView(ListAPIView):
     queryset = User.objects.all()
     serializer_class = ForAdminUserSerializer
-    permission_classes = [AdminPermission]
+    # permission_classes = [AdminPermission]
+    # permission_classes = [CodeNamePermission('admins.view_user')]
+    permission_classes = [ViewUserPermission]
 
 class UserView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = ForAdminUserSerializer
-    permission_classes = [AdminPermission]
+    # permission_classes = [AdminPermission]
+    # permission_classes = [CodeNamePermission('admins.view_user')]
+    permission_classes = [ViewUserPermission]
 
-class ClientListView(ListAPIView):
-    queryset = Client.objects.all()
-    serializer_class = ForAdminClientSerializer
-    permission_classes = [AdminPermission]
+# class ClientListView(ListAPIView):
+#     queryset = Client.objects.all()
+#     serializer_class = ForAdminClientSerializer
+#     permission_classes = [AdminPermission]
 
-class ClientView(RetrieveAPIView):
-    queryset = Client.objects.all()
-    serializer_class = ForAdminClientSerializer
-    permission_classes = [AdminPermission]
+# class ClientView(RetrieveAPIView):
+#     queryset = Client.objects.all()
+#     serializer_class = ForAdminClientSerializer
+#     permission_classes = [AdminPermission]
 
-class SpecialistListView(ListAPIView):
-    queryset = Specialist.objects.all()
-    serializer_class = ForAdminSpecialistSerializer
-    permission_classes = [AdminPermission]
+# class SpecialistListView(ListAPIView):
+#     queryset = Specialist.objects.all()
+#     serializer_class = ForAdminSpecialistSerializer
+#     permission_classes = [AdminPermission]
 
-class SpecialistView(RetrieveAPIView):
-    queryset = Specialist.objects.all()
-    serializer_class = ForAdminSpecialistSerializer
-    permission_classes = [AdminPermission]
+# class SpecialistView(RetrieveAPIView):
+#     queryset = Specialist.objects.all()
+#     serializer_class = ForAdminSpecialistSerializer
+#     permission_classes = [AdminPermission]
 
-class SlotActionListView(ListAPIView):
-    serializer_class = ForAdminSlotActionSerializer
-    permission_classes = [AdminPermission]
+# class SlotActionListView(ListAPIView):
+#     serializer_class = ForAdminSlotActionSerializer
+#     # permission_classes = [AdminPermission]
+#     permission_classes = [CodeNamePermission('admins.view_slot_action')]
 
-    def get_queryset(self):
-        return SlotAction.objects.all()
+#     def get_queryset(self):
+#         return SlotAction.objects.all()
     
-class SlotActionOneView(RetrieveAPIView):
-    serializer_class = ForAdminSlotActionSerializer
-    permission_classes = [AdminPermission]
+# class SlotActionOneView(RetrieveAPIView):
+#     serializer_class = ForAdminSlotActionSerializer
+#     # permission_classes = [AdminPermission]
+#     permission_classes = [CodeNamePermission('admins.view_slot_action')]
 
-    def get_queryset(self):
-        return SlotAction.objects.all()
+#     def get_queryset(self):
+#         return SlotAction.objects.all()
 
 # Create your views here.
 def change_user_active(request, user, active):
@@ -95,11 +102,15 @@ def change_user_active(request, user, active):
                 }, 200)
         
 @api_view(["POST",])
-@permission_classes([AdminPermission])
+# @permission_classes([AdminPermission])
+# @permission_classes([CodeNamePermission('admins.change_user_status')])
+@permission_classes([ChangeUserStatusPermission])
 def user_activate(request, user):
     return change_user_active(request, user, True)
 
 @api_view(["POST",])
-@permission_classes([AdminPermission])
+# @permission_classes([AdminPermission])
+# @permission_classes([CodeNamePermission('admins.change_user_status')])
+@permission_classes([ChangeUserStatusPermission])
 def user_deactivate(request, user):
     return change_user_active(request, user, False)

@@ -15,6 +15,16 @@ def is_datetimes_intersect(datetime_a_1, datetime_a_2, datetime_b_1, datetime_b_
     
     return (datetime_a_2 > datetime_b_1 and datetime_a_1 <= datetime_b_1) or (datetime_b_2 > datetime_a_1 and datetime_b_1 <= datetime_a_1)
 
+def get_user_type_caption(user):
+    if user.groups.filter(name="clients").exists():
+        return "Client"
+    elif user.groups.filter(name="specialists").exists():
+        return "Specialist"
+    elif user.groups.filter(name="admins").exists():
+        return "Admin"
+    else:
+        return ""
+
 # def get_user_type_caption(user):
 #     if Client.is_own(user):
 #         return "Client"
@@ -25,17 +35,28 @@ def is_datetimes_intersect(datetime_a_1, datetime_a_2, datetime_b_1, datetime_b_
 #     else:
 #         return "Anonymous"
 
-def get_user_type_caption(user):
-    if Client.is_own(user):
-        return "Client"
-    elif Specialist.is_own(user):
-        return "Specialist"
-    # elif user and user.is_staff:
-    elif Admin.is_own(user):
-        return "Admin"
-    else:
-        return "Anonymous"
+# def get_user_type_caption(user):
+#     if Client.is_own(user):
+#         return "Client"
+#     elif Specialist.is_own(user):
+#         return "Specialist"
+#     # elif user and user.is_staff:
+#     elif Admin.is_own(user):
+#         return "Admin"
+#     else:
+#         return "Anonymous"
     
+# def get_user_type_caption(user):
+#     if Client.is_own(user):
+#         return "Client"
+#     elif Specialist.is_own(user):
+#         return "Specialist"
+#     # elif user and user.is_staff:
+#     elif Admin.is_own(user):
+#         return "Admin"
+#     else:
+#         return "Anonymous"
+
 def str_to_datetime(str, tz_str=""):
     if tz_str:
         return datetime.strptime(f"{str} {tz_str}", "%Y-%m-%d %H:%M:%S %z")

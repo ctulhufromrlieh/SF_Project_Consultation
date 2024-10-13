@@ -14,7 +14,7 @@ from main.utils import *
 skip_tests = False
 
 class TestsMixin():
-    need_params = False
+    is_logined = False
 
     def setUp(self) -> None:
         super().setUp()
@@ -23,32 +23,25 @@ class TestsMixin():
         super().tearDown()
 
     # remove "a" for separate tests
-    # def atest_specialist_list(self):
-    #     self.check_get_status("/specialists")
-    
-    # def atest_specialist_one_1(self):
-    #     self.check_get_status("/specialists/1")
-
     def atest_slot_list(self):
         self.check_get_status("/slots")
 
     def atest_slot_one_1(self):
         self.check_get_status("/slots/3")
 
-    # def atest_slot_sign_1(self):
-    #     self.check_post_status("/slots/sign/3")
+    def atest_slot_accept_1(self):
+        if not self.is_logined:
+            self.check_post_status("/slots/accept/1")
 
-    # def atest_slot_unsign_1(self):
-    #     if not self.need_params:        
-    #         self.check_post_status("/slots/unsign/1")
+    def atest_slot_decline_1(self):
+        if not self.is_logined:
+            self.check_post_status("/slots/decline/1")
 
     def test_all(self):
-        # self.atest_specialist_list()
-        # self.atest_specialist_one_1()
         self.atest_slot_list()
         self.atest_slot_one_1()
-        # self.atest_slot_sign_1()
-        # self.atest_slot_unsign_1()
+        self.atest_slot_accept_1()
+        self.atest_slot_decline_1()
 
 @unittest.skipIf(skip_tests, "Skip these tests")
 class AnonymousTests(TestsMixin, AnonymousBaseTest):
@@ -76,12 +69,11 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
     password = "spec1psw"
     myspec = None
 
-    need_params = True
+    is_logined = True
 
     def setUp(self) -> None:
         super().setUp()
-        self.myspec = Specialist.objects.get(user__username=self.username)
-        # print(self.myclient)
+        self.myspec = User.objects.get(username=self.username)
 
     def atest_slot_list(self):
         slots_b = Slot.objects.exclude(is_deleted=True).filter(specialist=self.myspec)
@@ -132,7 +124,7 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         self.check_post_simple("/slots/decline/3", 400, "error", "Client is not assigned yet")
 
         slot = Slot.objects.get(pk=2)
-        client = Client.objects.get(pk=2)
+        client = User.objects.filter(groups__name='clients').get(pk=2)
         self.assertEqual(slot.client, client)
 
         self.check_post_simple("/slots/decline/2", 200, "success", "You successfully decline slot")
@@ -241,4 +233,3 @@ class SpecialistTests(TestsMixin, SuccessBaseTest):
         new_slot_count = Slot.objects.exclude(is_deleted=True).count()
         self.assertEqual(new_slot_count + 1, old_slot_count)
         self.assertEqual(Slot.objects.exclude(is_deleted=True).filter(pk=slot_id).first(), None)
-

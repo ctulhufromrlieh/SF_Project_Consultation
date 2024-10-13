@@ -39,45 +39,47 @@ class ReasonType(models.Model):
     def __str__(self):
         return self.name
     
-class Client(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="client")
-    name = models.CharField(max_length=255, unique=True, help_text="Client name")
+# class Client(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="client")
+#     name = models.CharField(max_length=255, unique=True, help_text="Client name")
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
     
-    @staticmethod
-    def is_own(user):
-        return user.groups.filter(name='clients').exists()
+#     @staticmethod
+#     def is_own(user):
+#         return user.groups.filter(name='clients').exists()
 
 
-class Specialist(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="specialist")
-    name = models.CharField(max_length=255, unique=True, help_text="Specialist name")
+# class Specialist(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="specialist")
+#     name = models.CharField(max_length=255, unique=True, help_text="Specialist name")
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
     
-    @staticmethod
-    def is_own(user):
-        return user.groups.filter(name='specialists').exists()
+#     @staticmethod
+#     def is_own(user):
+#         return user.groups.filter(name='specialists').exists()
    
 
-class Admin(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin")
-    name = models.CharField(max_length=255, unique=True, help_text="Admin name")
+# class Admin(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="admin")
+#     name = models.CharField(max_length=255, unique=True, help_text="Admin name")
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
     
-    @staticmethod
-    def is_own(user):
-        return user.groups.filter(name='admins').exists()
+#     @staticmethod
+#     def is_own(user):
+#         return user.groups.filter(name='admins').exists()
     
 
 class Slot(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    specialist = models.ForeignKey(Specialist, on_delete=models.CASCADE)
+    # client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    # specialist = models.ForeignKey(Specialist, on_delete=models.CASCADE)
+    client = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="client_slots")
+    specialist = models.ForeignKey(User, on_delete=models.CASCADE, related_name="specialist_slots")
     type = models.ForeignKey(ConsultType, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=255, help_text="Slot title")
     datetime1 = models.DateTimeField(help_text="Datetime of start")
@@ -108,9 +110,18 @@ class Slot(models.Model):
 
         return f"{self.datetime1} : {spec_name} - {client_name} -- {is_accepted_str}"
 
+    # class Meta:
+    #     permissions = [
+    #         ("sign_slot", "Can sign slot"),
+    #         ("unsign_slot", "Can unsign slot"),
+    #         ("accept_slot", "Can accept slot with client"),
+    #         ("decline_slot", "Can decline slot with client"),
+    #     ]
+
 
 class SlotAction(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    # client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    client = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="client_slot_actions")
     slot = models.ForeignKey(Slot, on_delete=models.CASCADE)
     # status = models.CharField(max_length=3, choices=SlotStatusTypes.choices, default=SlotStatusTypes.SLOT_STATUS_NEW)
     status = models.CharField(max_length=3, choices=SlotStatusActionType.choices, default=SlotStatusActionType.SLOT_STATUS_ACTION_NEW)

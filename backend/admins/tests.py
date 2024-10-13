@@ -13,7 +13,7 @@ from main.tests_common import *
 skip_tests = False
 
 class TestsMixin():
-    need_params = False
+    is_logined = False
 
     def setUp(self) -> None:
         super().setUp()
@@ -21,41 +21,37 @@ class TestsMixin():
     def tearDown(self) -> None:
         super().tearDown()
 
+    @staticmethod
+    def is_for_admin_users_equal(obj, dict):
+        return (
+            (obj.pk == dict["id"]) and
+            (obj.username == dict["username"]) and
+            (obj.first_name == dict["first_name"]) and
+            (obj.last_name == dict["last_name"]) and
+            (obj.last_name == dict["last_name"]) and 
+            (get_user_type_caption(obj) == dict["user_type_caption"])
+        )
+
     # remove "a" for separate tests
     def atest_user_list(self):
-        self.check_get_status("/clients")
+        self.check_get_status("/users")
     
     def atest_user_one_1(self):
-        self.check_get_status("/clients/1")
+        self.check_get_status("/users/1")
 
-    def atest_client_list(self):
-        self.check_get_status("/clients")
-    
-    def atest_client_one_1(self):
-        self.check_get_status("/clients/1")
+    def atest_user_activate_1(self):
+        if not self.is_logined:
+            self.check_post_status("/users/activate/1")
 
-    def atest_specialist_list(self):
-        self.check_get_status("/specialists")
-    
-    def atest_specialist_one_1(self):
-        self.check_get_status("/specialists/1")
-
-    # def atest_user_activate_1(self):
-    #     self.check_post_status("/users/activate/1")
-
-    # def atest_user_deactivate_1(self):
-    #     if not self.need_params:        
-    #         self.check_post_status("/users/deactivate/1")
+    def atest_user_deactivate_1(self):
+        if not self.is_logined:
+            self.check_post_status("/users/deactivate/1")
 
     def test_all(self):
         self.atest_user_list()
         self.atest_user_one_1()
-        self.atest_client_list()
-        self.atest_client_one_1()
-        self.atest_specialist_list()
-        self.atest_specialist_one_1()
-        # self.atest_user_activate_1()
-        # self.atest_user_deactivate_1()
+        self.atest_user_activate_1()
+        self.atest_user_deactivate_1()
 
 @unittest.skipIf(skip_tests, "Skip these tests")
 class AnonymousTests(TestsMixin, AnonymousBaseTest):
@@ -83,21 +79,19 @@ class AdminTests(TestsMixin, SuccessBaseTest):
     password = "admin1psw"
     myadmin = None
 
-    need_params = True
+    is_logined = True
 
     def setUp(self) -> None:
         super().setUp()
-        self.myadmin = Admin.objects.get(user__username=self.username)
-        # print(self.myclient)
+        self.myadmin = User.objects.get(username=self.username)
 
     def atest_user_list_a(self):
         users_b = User.objects.all()
 
         resp_result = self.get_simple("/users")
-        # print(resp_result)
         users_r = resp_result["data"]
 
-        # self.assertEqual(resp_result["status_code"], 200)
+        self.assertEqual(resp_result["status_code"], 200)
         self.assertEqual(users_b.count(), len(users_r))
 
         for i in range(len(users_r)):
@@ -113,17 +107,17 @@ class AdminTests(TestsMixin, SuccessBaseTest):
             curr_user_r = curr_resp_result["data"]
             curr_user_b = User.objects.get(pk=curr_id)
 
-            # self.assertEqual(resp_result["status_code"], 200)
+            self.assertEqual(curr_resp_result["status_code"], 200)
             self.assertTrue(self.is_users_equal(curr_user_b, curr_user_r))
 
     def atest_specialist_list_a(self):
-        specs_b = Specialist.objects.all()
+        # specs_b = Specialist.objects.all()
+        specs_b = User.objects.filter(groups__name='specialists')
 
         resp_result = self.get_simple("/specialists")
-        # print(resp_result)
         specs_r = resp_result["data"]
 
-        # self.assertEqual(resp_result["status_code"], 200)
+        self.assertEqual(resp_result["status_code"], 200)
         self.assertEqual(specs_b.count(), len(specs_r))
 
         for i in range(len(specs_r)):
@@ -137,19 +131,18 @@ class AdminTests(TestsMixin, SuccessBaseTest):
             curr_loc_url = f"/specialists/{curr_id}"
             curr_resp_result = self.get_simple(curr_loc_url)
             curr_spec_r = curr_resp_result["data"]
-            curr_spec_b = Specialist.objects.get(pk=curr_id)
+            curr_spec_b = User.objects.filter(groups__name='specialists').get(pk=curr_id)
 
-            # self.assertEqual(resp_result["status_code"], 200)
+            self.assertEqual(curr_resp_result["status_code"], 200)
             self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
 
     def atest_client_list_a(self):
-        clients_b = Client.objects.all()
+        clients_b = User.objects.filter(groups__name='clients')
 
         resp_result = self.get_simple("/clients")
-        # print(resp_result)
         clients_r = resp_result["data"]
 
-        # self.assertEqual(resp_result["status_code"], 200)
+        self.assertEqual(resp_result["status_code"], 200)
         self.assertEqual(clients_b.count(), len(clients_r))
 
         for i in range(len(clients_r)):
@@ -163,20 +156,14 @@ class AdminTests(TestsMixin, SuccessBaseTest):
             curr_loc_url = f"/clients/{curr_id}"
             curr_resp_result = self.get_simple(curr_loc_url)
             curr_client_r = curr_resp_result["data"]
-            curr_client_b = Client.objects.get(pk=curr_id)
+            curr_client_b = User.objects.filter(groups__name='specialists').get(pk=curr_id)
 
-            # self.assertEqual(resp_result["status_code"], 200)
+            self.assertEqual(resp_result["status_code"], 200)
             self.assertTrue(self.is_clients_equal(curr_client_b, curr_client_r))
 
     def test_get(self):
         self.atest_user_list_a()
         self.atest_user_one_a()
-        self.atest_specialist_list_a()
-        self.atest_specialist_one_a()
-        self.atest_client_list_a()
-        self.atest_client_one_a()
-        # self.atest_slot_list()
-        # self.atest_slot_one()
 
     def test_activate_and_deactivate(self):
         self.check_post_simple("/users/activate/", 404, "", "")

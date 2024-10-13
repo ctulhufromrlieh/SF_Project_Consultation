@@ -23,12 +23,8 @@ from admins.views import *
 urlpatterns = [
     path('users', UserListView.as_view(), name='api_admins_user_list'),
     path('users/<int:pk>', UserView.as_view(), name='api_admins_user_one'),
-    path('clients', ClientListView.as_view(), name='api_admins_client_list'),
-    path('clients/<int:pk>', ClientView.as_view(), name='api_admins_client_one'),
-    path('specialists', SpecialistListView.as_view(), name='api_admins_specialist_list'),
-    path('specialists/<int:pk>', SpecialistView.as_view(), name='api_admins_specialist_one'),
     path('users/activate/<int:user>', user_activate, name='api_admins_user_activate'),
     path('users/deactivate/<int:user>', user_deactivate, name='api_admins_user_deactivate'),
-    path('slot_actions', SlotActionListView.as_view(), name='api_admins_slot_actions_list'),
-    path('slot_actions/<int:pk>', SlotActionOneView.as_view(), name='api_admins_slot_action_one'),    
+    # path('slot_actions', SlotActionListView.as_view(), name='api_admins_slot_actions_list'),
+    # path('slot_actions/<int:pk>', SlotActionOneView.as_view(), name='api_admins_slot_action_one'),    
 ]

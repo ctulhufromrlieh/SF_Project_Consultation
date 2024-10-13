@@ -41,35 +41,44 @@ class BaseTest(APITestCase):
         else:
             return None
 
+    # @staticmethod
+    # def is_users_equal(obj, dict):
+    #     return (
+    #         (obj.pk == dict["id"]) and
+    #         (obj.username == dict["username"]) and
+    #         (get_user_type_caption(obj) == dict["user_type_caption"])
+    #     )
+
+    # @staticmethod
+    # def is_clients_equal(obj, dict):
+    #     return (
+    #         (obj.pk == dict["id"]) and
+    #         (obj.name == dict["name"])
+    #     )
+
+    # @staticmethod
+    # def is_specialists_equal(obj, dict):
+    #     return (
+    #         (obj.pk == dict["id"]) and
+    #         (obj.name == dict["name"])
+    #     )
+
+    # @staticmethod
+    # def is_admins_equal(obj, dict):
+    #     return (
+    #         (obj.pk == dict["id"]) and
+    #         (obj.name == dict["name"])
+    #     )
+    
     @staticmethod
     def is_users_equal(obj, dict):
         return (
             (obj.pk == dict["id"]) and
             (obj.username == dict["username"]) and
-            (get_user_type_caption(obj) == dict["user_type_caption"])
+            (obj.first_name == dict["first_name"]) and
+            (obj.last_name == dict["last_name"])
         )
 
-    @staticmethod
-    def is_clients_equal(obj, dict):
-        return (
-            (obj.pk == dict["id"]) and
-            (obj.name == dict["name"])
-        )
-
-    @staticmethod
-    def is_specialists_equal(obj, dict):
-        return (
-            (obj.pk == dict["id"]) and
-            (obj.name == dict["name"])
-        )
-
-    @staticmethod
-    def is_admins_equal(obj, dict):
-        return (
-            (obj.pk == dict["id"]) and
-            (obj.name == dict["name"])
-        )
-    
     @staticmethod
     def is_slots_equal(obj, dict):
         if obj.client:
@@ -145,8 +154,12 @@ class BaseTest(APITestCase):
         response = self.client.get(url, data, headers=headers)
         # print("url:")
         # print(url)
+        # print("headers:")
+        # print(headers)
         # print("response.content:")
         # print(response.content)
+        # print("response.status_code:")
+        # print(response.status_code)
         json_response = json.loads(response.content)
 
         self.assertEqual(response.status_code, status_code)
@@ -159,8 +172,16 @@ class BaseTest(APITestCase):
         url = self.base_url + loc_url
         headers = self.get_headers()
         
+    
         response = self.client.post(url, data, headers=headers)
-        
+        # print("url:")
+        # print(url)
+        # print("headers:")
+        # print(headers)
+        # print("response.content:")
+        # print(response.content)           
+        # print("response.status_code:")
+        # print(response.status_code)
         if not (response.status_code == 404):
             json_response = json.loads(response.content)
 
@@ -319,27 +340,27 @@ def get_token_for_user(username, password):
         return None
 
 def create_example_database_only_users_1():
-    # Groups
-    group_clients, created = Group.objects.get_or_create(name="clients")
-    group_specialists, created = Group.objects.get_or_create(name="specialists")
-    group_admins, created = Group.objects.get_or_create(name="admins")
+    # # Groups
+    # group_clients, created = Group.objects.get_or_create(name="clients")
+    # group_specialists, created = Group.objects.get_or_create(name="specialists")
+    # group_admins, created = Group.objects.get_or_create(name="admins")
 
     User.objects.exclude(username="admin").delete()
 
     # Clients
-    Client.objects.all().delete()
+    # Client.objects.all().delete()
 
     create_client(name='Вася Пупкин', username="client1", email="client1@clients.aa", password="client1psw")
     create_client(name='Иван Петров', username="client2", email="client2@clients.bb", password="client2psw")
 
     # Specialists
-    Specialist.objects.all().delete()
+    # Specialist.objects.all().delete()
 
     create_specialist(name="Проффффессор", username="spec1", email="spec1@specialists.aa", password="spec1psw")
     create_specialist(name="Доцент", username="spec2", email="spec2@specialists.bb", password="spec2psw")
 
     # Admins
-    Admin.objects.all().delete()
+    # Admin.objects.all().delete()
 
     create_admin(name="ГлавАдмин", username="admin1", email="admin1@admins.aa", password="admin1psw")
     create_admin(name="Почти главный админ", username="admin2", email="admin2@admins.bb", password="admin2psw")
@@ -347,14 +368,18 @@ def create_example_database_only_users_1():
 def create_example_database_1():
     create_example_database_only_users_1()
 
-    client1 = Client.objects.get(user__username="client1")
-    client2 = Client.objects.get(user__username="client2")
+    # client1 = Client.objects.get(user__username="client1")
+    # client2 = Client.objects.get(user__username="client2")
+    client1 = User.objects.get(username="client1")
+    client2 = User.objects.get(username="client2")
 
-    spec1 = Specialist.objects.get(user__username="spec1")
-    spec2 = Specialist.objects.get(user__username="spec2")
+    # spec1 = Specialist.objects.get(user__username="spec1")
+    # spec2 = Specialist.objects.get(user__username="spec2")
+    spec1 = User.objects.get(username="spec1")
+    spec2 = User.objects.get(username="spec2")
 
-    # admin1 = Admin.objects.get(user__username="admin1")
-    # admin2 = Admin.objects.get(user__username="admin2")
+    # # admin1 = Admin.objects.get(user__username="admin1")
+    # # admin2 = Admin.objects.get(user__username="admin2")
 
     # ConsultType
     ConsultType.objects.all().delete()

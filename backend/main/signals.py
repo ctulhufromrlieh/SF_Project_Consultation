@@ -1,10 +1,18 @@
 import datetime
 
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, post_migrate
+from django.apps import AppConfig
 from django.dispatch import receiver
 
 from .models import Slot, SlotAction, SlotStatusActionType
 from .email_sending import send_email_about_slot_action
+# from .db_init import *
+
+# @receiver(post_migrate, sender=AppConfig)
+# def migrations_made(sender, app_config, verbosity, interactive, stdout, using, plan, apps, **kwargs):
+#     print("migrations_made")
+#     # raise Exception("123")
+#     create_permissions()
 
 @receiver(post_save, sender=SlotAction)
 def slot_action_created(sender, instance, created, **kwargs):

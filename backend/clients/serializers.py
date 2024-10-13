@@ -1,17 +1,22 @@
 from main.models import *
 from rest_framework import serializers
 
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = ('id', 'name')
+# class ClientSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Client
+#         fields = ('id', 'name')
 
-class SpecialistSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Specialist
-        fields = ('id', 'name')
+# class SpecialistSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Specialist
+#         fields = ('id', 'name')
 
-class SlotSerializer(serializers.ModelSerializer):
+class ForClientUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name')
+
+class ForClientSlotSerializer(serializers.ModelSerializer):
     client__name = serializers.CharField(source='client.name', required=False, allow_null=True, )
     specialist__name = serializers.CharField(source='specialist.name', required=False, allow_null=True, )
     type__name = serializers.CharField(source='type.name', required=False, allow_null=True, )
@@ -30,9 +35,11 @@ class SlotSerializer(serializers.ModelSerializer):
                  )
         
 class ForClientSlotActionSerializer(serializers.ModelSerializer):
-    client__name = serializers.CharField(source='client.name', required=False, allow_null=True,)
+    # client__name = serializers.CharField(source='client.name', required=False, allow_null=True,)
+    client__name = serializers.CharField(source='client.first_name', required=False, allow_null=True,)
     slot__specialist = serializers.CharField(source='slot.specialist')
-    slot__specialist__name = serializers.CharField(source='slot.specialist.name', required=False, allow_null=True,)
+    # slot__specialist__name = serializers.CharField(source='slot.specialist.name', required=False, allow_null=True,)
+    slot__specialist__name = serializers.CharField(source='slot.specialist.first_name', required=False, allow_null=True,)
     # slot__type = serializers.IntegerField(source='slot.type')
     slot__type = serializers.CharField(source='slot.type')
     slot__type__name = serializers.CharField(source='slot.type.name', required=False, allow_null=True,)
@@ -52,7 +59,8 @@ class ForClientSlotActionSerializer(serializers.ModelSerializer):
                   'status', 'reason_type', 'reason_type__name', 'comment', 'datetime',
                  )
         
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    # client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(User, on_delete=models.CASCADE)
     slot = models.ForeignKey(Slot, on_delete=models.CASCADE)
     # status = models.CharField(max_length=3, choices=SlotStatusTypes.choices, default=SlotStatusTypes.SLOT_STATUS_NEW)
     status = models.CharField(max_length=3, choices=SlotStatusActionType.choices, default=SlotStatusActionType.SLOT_STATUS_ACTION_NEW)

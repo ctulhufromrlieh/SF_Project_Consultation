@@ -8,7 +8,8 @@ from .models import SlotAction, SlotStatusActionType
 
 def send_email_about_slot_action(slot_action):
     if slot_action.status == SlotStatusActionType.SLOT_STATUS_ACTION_NEW:
-        to_user = slot_action.slot.specialist.user
+        # to_user = slot_action.slot.specialist.user
+        to_user = slot_action.slot.specialist
         text_content = (
             f"Уважаемый {to_user.username}!\n"
             f"Слот {slot_action.slot.pk} успешно создан!"
@@ -18,58 +19,73 @@ def send_email_about_slot_action(slot_action):
             f"Слот {slot_action.slot.pk} успешно создан!"
         )
     elif slot_action.status == SlotStatusActionType.SLOT_STATUS_ACTION_CLIENT_SIGN:
-        to_user = slot_action.slot.specialist.user
+        # to_user = slot_action.slot.specialist.user
+        to_user = slot_action.slot.specialist
         text_content = (
             f"Уважаемый {to_user.username}!\n"
-            f"Пользователь {slot_action.slot.client.user.username} оставил заявке на слот {slot_action.slot.pk}!"
+            # f"Пользователь {slot_action.slot.client.user.username} оставил заявке на слот {slot_action.slot.pk}!"
+            f"Пользователь {slot_action.slot.client.username} оставил заявке на слот {slot_action.slot.pk}!"
         )
         html_content = (
             f"Уважаемый {to_user.username}!<br>"
-            f"Пользователь {slot_action.slot.client.user.username} оставил заявку на слот {slot_action.slot.pk}!"
+            # f"Пользователь {slot_action.slot.client.user.username} оставил заявку на слот {slot_action.slot.pk}!"
+            f"Пользователь {slot_action.slot.client.username} оставил заявку на слот {slot_action.slot.pk}!"
         )
     elif slot_action.status == SlotStatusActionType.SLOT_STATUS_ACTION_CLIENT_UNSIGN:
         # print(f"slot_action.slot.specialist={slot_action.slot.specialist}")
         # print(f"slot_action.slot.specialist.user={slot_action.slot.specialist.user}")
-        to_user = slot_action.slot.specialist.user
+        # to_user = slot_action.slot.specialist.user
+        to_user = slot_action.slot.specialist
         text_content = (
             f"Уважаемый {to_user.username}!\n"
-            f"Пользователь {slot_action.client.user.username} отменил заявку на слот {slot_action.slot.pk}!"
+            # f"Пользователь {slot_action.client.user.username} отменил заявку на слот {slot_action.slot.pk}!"
+            f"Пользователь {slot_action.client.username} отменил заявку на слот {slot_action.slot.pk}!"
         )
         html_content = (
             f"Уважаемый {to_user.username}!<br>"
-            f"Пользователь {slot_action.client.user.username} отменил заявку на слот {slot_action.slot.pk}!"
+            # f"Пользователь {slot_action.client.user.username} отменил заявку на слот {slot_action.slot.pk}!"
+            f"Пользователь {slot_action.client.username} отменил заявку на слот {slot_action.slot.pk}!"
         )
     elif slot_action.status == SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_ACCEPT:
-        to_user = slot_action.slot.client.user
+        # to_user = slot_action.slot.client.user
+        to_user = slot_action.slot.client
         text_content = (
             f"Уважаемый {to_user.username}!\n"
-            f"Специалист {slot_action.slot.specialist.user.username} одобрил Вашу заявку на слот {slot_action.slot.pk}!"
+            # f"Специалист {slot_action.slot.specialist.user.username} одобрил Вашу заявку на слот {slot_action.slot.pk}!"
+            f"Специалист {slot_action.slot.specialist.username} одобрил Вашу заявку на слот {slot_action.slot.pk}!"
         )
         html_content = (
             f"Уважаемый {to_user.username}!<br>"
-            f"Специалист {slot_action.slot.specialist.user.username} одобрил Вашу заявку на слот {slot_action.slot.pk}!"
+            # f"Специалист {slot_action.slot.specialist.user.username} одобрил Вашу заявку на слот {slot_action.slot.pk}!"
+            f"Специалист {slot_action.slot.specialist.username} одобрил Вашу заявку на слот {slot_action.slot.pk}!"
         )
     elif slot_action.status == SlotStatusActionType.SLOT_STATUS_ACTION_SPECIALIST_DECLINE:
-        to_user = slot_action.client.user
+        # to_user = slot_action.client.user
+        to_user = slot_action.client
         text_content = (
             f"Уважаемый {to_user.username}!\n"
-            f"Специалист {slot_action.slot.specialist.user.username} отклонил Вашу заявку на {slot_action.slot.pk}!"
+            # f"Специалист {slot_action.slot.specialist.user.username} отклонил Вашу заявку на {slot_action.slot.pk}!"
+            f"Специалист {slot_action.slot.specialist.username} отклонил Вашу заявку на {slot_action.slot.pk}!"
         )
         html_content = (
             f"Уважаемый {to_user.username}!<br>"
-            f"Специалист {slot_action.slot.specialist.user.username} отклонил Вашу заявку на {slot_action.slot.pk}!"
+            # f"Специалист {slot_action.slot.specialist.user.username} отклонил Вашу заявку на {slot_action.slot.pk}!"
+            f"Специалист {slot_action.slot.specialist.username} отклонил Вашу заявку на {slot_action.slot.pk}!"
         )
     elif slot_action.status == SlotStatusActionType.SLOT_STATUS_ACTION_DELETE:
         client = slot_action.slot.client
         if client:            
-            to_user = client.user
+            # to_user = client.user
+            to_user = client
             text_content = (
                 f"Уважаемый {to_user.username}!\n"
-                f"Специалист {slot_action.slot.specialist.user.username} отменил слот {slot_action.slot.pk}!"
+                # f"Специалист {slot_action.slot.specialist.user.username} отменил слот {slot_action.slot.pk}!"
+                f"Специалист {slot_action.slot.specialist.username} отменил слот {slot_action.slot.pk}!"
             )
             html_content = (
                 f"Уважаемый {to_user.username}!<br>"
-                f"Специалист {slot_action.slot.specialist.user.username} отменил слот {slot_action.slot.pk}!"
+                # f"Специалист {slot_action.slot.specialist.user.username} отменил слот {slot_action.slot.pk}!"
+                f"Специалист {slot_action.slot.specialist.username} отменил слот {slot_action.slot.pk}!"
             )
         else:
             to_user = None

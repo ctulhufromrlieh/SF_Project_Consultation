@@ -13,7 +13,7 @@ from main.tests_common import *
 skip_tests = False
 
 class TestsMixin():
-    need_params = False
+    is_logined = False
 
     def setUp(self) -> None:
         super().setUp()
@@ -26,7 +26,7 @@ class TestsMixin():
         self.check_get_status("/specialists")
     
     def atest_specialist_one_1(self):
-        self.check_get_status("/specialists/1")
+        self.check_get_status("/specialists/3")
 
     def atest_slot_list(self):
         self.check_get_status("/slots")
@@ -35,11 +35,12 @@ class TestsMixin():
         self.check_get_status("/slots/3")
 
     def atest_slot_sign_1(self):
-        self.check_post_status("/slots/sign/3")
+        if not self.is_logined:        
+            self.check_post_status("/slots/sign/3")
 
     def atest_slot_unsign_1(self):
-        if not self.need_params:        
-            self.check_post_status("/slots/unsign/1")
+        if not self.is_logined:        
+            self.check_post_status("/slots/unsign/3")
 
     def test_all(self):
         self.atest_specialist_list()
@@ -75,38 +76,36 @@ class ClientTests(TestsMixin, SuccessBaseTest):
     password = "client1psw"
     myclient = None
 
-    need_params = True
+    is_logined = True
 
     def setUp(self) -> None:
         super().setUp()
-        self.myclient = Client.objects.get(user__username=self.username)
-        # print(self.myclient)
+        self.myclient = User.objects.get(username=self.username)
 
     def atest_specialist_list(self):
-        specs_b = Specialist.objects.all()
+        specs_b = User.objects.filter(groups__name='specialists')
 
         resp_result = self.get_simple("/specialists")
-        # print(resp_result)
         specs_r = resp_result["data"]
 
-        # self.assertEqual(resp_result["status_code"], 200)
+        self.assertEqual(resp_result["status_code"], 200)
         self.assertEqual(specs_b.count(), len(specs_r))
 
         for i in range(len(specs_r)):
             curr_spec_r = specs_r[i]
             curr_spec_b = specs_b[i]
-            self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
+            self.assertTrue(self.is_users_equal(curr_spec_b, curr_spec_r))
     
     def atest_specialist_one(self):
-        ids = [1, 2]
+        ids = [3, 4]
         for curr_id in ids:
             curr_loc_url = f"/specialists/{curr_id}"
             curr_resp_result = self.get_simple(curr_loc_url)
             curr_spec_r = curr_resp_result["data"]
-            curr_spec_b = Specialist.objects.get(pk=curr_id)
+            curr_spec_b = User.objects.filter(groups__name='specialists').get(pk=curr_id)
 
-            # self.assertEqual(resp_result["status_code"], 200)
-            self.assertTrue(self.is_specialists_equal(curr_spec_b, curr_spec_r))
+            self.assertEqual(curr_resp_result["status_code"], 200)
+            self.assertTrue(self.is_users_equal(curr_spec_b, curr_spec_r))
 
     def atest_slot_list(self):
         slots_b = Slot.objects.exclude(is_deleted=True).filter(Q(client=None) | Q(client=self.myclient))
@@ -114,7 +113,7 @@ class ClientTests(TestsMixin, SuccessBaseTest):
         resp_result = self.get_simple("/slots")
         slots_r = resp_result["data"]
 
-        # self.assertEqual(resp_result["status_code"], 200)
+        self.assertEqual(resp_result["status_code"], 200)
         self.assertEqual(slots_b.count(), len(slots_r))
 
         for i in range(len(slots_r)):
@@ -173,8 +172,6 @@ class ClientTests(TestsMixin, SuccessBaseTest):
         self.assertEqual(last_slot_action.comment, "")
         self.assertEqual(Slot.objects.filter(pk=1).first().client, None)
 
-        # self.assertEqual(Slot.objects.filter(pk=1).first().cancel_comment, "")
         self.check_post_simple("/slots/unsign/3", 200, "success", "You successfully unsigned from slot", data={"comment": "I am sorry"})
         last_slot_action = SlotAction.objects.order_by('pk').last()
         self.assertEqual(last_slot_action.comment, "I am sorry")
-        # print(resp_result)
