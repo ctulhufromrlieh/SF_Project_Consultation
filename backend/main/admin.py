@@ -102,10 +102,13 @@ class UserAdmin(BaseUserAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        if obj.group_to_add:
-            obj.groups.add(obj.group_to_add)
+        if hasattr(obj, "group_to_add"):
+            if obj.group_to_add:
+                obj.groups.add(obj.group_to_add)
 
 # Register your models here.
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Slot)
+admin.site.register(ConsultType)
+admin.site.register(ReasonType)

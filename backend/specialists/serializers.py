@@ -39,7 +39,7 @@ class SlotSerializerWrite(serializers.ModelSerializer):
         if datetime1 >= datetime2:
             errors["datetime1, datetime2"] = "Datetime2 should be greater then Datetime1!"
         else:
-            specialist_slots = Slot.objects.all().filter(specialist=user)
+            specialist_slots = Slot.objects.all().exclude(is_deleted=True).filter(specialist=user)
             if instance:
                 specialist_slots = specialist_slots.exclude(pk=instance.pk)
             for curr_slot in specialist_slots:

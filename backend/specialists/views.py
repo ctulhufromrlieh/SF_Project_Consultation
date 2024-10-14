@@ -84,7 +84,7 @@ class SlotActionListView(LoggedListModelMixin, ListAPIView):
 
     def get_queryset(self):
         try:
-            return SlotAction.objects.filter(slot__specialist=self.request.user.specialist)
+            return SlotAction.objects.filter(slot__specialist=self.request.user)
         except:
             return SlotAction.objects.none()
     
@@ -94,7 +94,7 @@ class SlotActionOneView(LoggedRetrieveModelMixin, RetrieveAPIView):
 
     def get_queryset(self):
         try:
-            return SlotAction.objects.filter(slot__specialist=self.request.user.specialist)
+            return SlotAction.objects.filter(slot__specialist=self.request.user)
         except:
             return SlotAction.objects.none()
 

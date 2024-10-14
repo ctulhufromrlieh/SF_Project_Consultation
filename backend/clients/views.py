@@ -54,7 +54,7 @@ class SlotActionListView(LoggedListModelMixin, ListAPIView):
 
     def get_queryset(self):
         try:
-            return SlotAction.objects.filter(client=self.request.user.client)
+            return SlotAction.objects.filter(client=self.request.user)
         except:
             return SlotAction.objects.none()
     
@@ -64,7 +64,7 @@ class SlotActionOneView(LoggedRetrieveModelMixin, RetrieveAPIView):
 
     def get_queryset(self):
         try:
-            return SlotAction.objects.filter(client=self.request.user.client)
+            return SlotAction.objects.filter(client=self.request.user)
         except:
             return SlotAction.objects.none()
 
@@ -152,9 +152,14 @@ def unsign_from_slot(request, slot):
             return Response({
                 "error": "You are not signed to this slot"
                 }, 400)
-        
+
         reason_type = request.POST.get('reason_type', -1)
+        if reason_type == -1:
+            reason_type = request.data.get('reason_type', -1)
         comment = request.POST.get('comment', "")
+        if not comment:
+            comment = request.data.get('comment', "")
+
         reason_type_obj = ReasonType.objects.filter(pk=reason_type).first()
         if not reason_type_obj:
             reason_type = -1
