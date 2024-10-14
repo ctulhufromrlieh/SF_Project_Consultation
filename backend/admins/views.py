@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -6,13 +8,17 @@ from django.contrib.auth.models import User
 from .permissions import *
 from .serializers import *
 from main.models import *
+from main.views import *
 
-class UserListView(ListAPIView):
+# logger = logging.getLogger(__name__)
+
+class UserListView(LoggedListModelMixin, ListAPIView):
     queryset = User.objects.all()
     serializer_class = ForAdminUserSerializer
     permission_classes = [ViewUserPermission]
 
-class UserView(RetrieveAPIView):
+
+class UserView(LoggedRetrieveModelMixin, RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = ForAdminUserSerializer
     permission_classes = [ViewUserPermission]
@@ -50,10 +56,12 @@ def change_user_active(request, user, active):
         
 @api_view(["POST",])
 @permission_classes([ChangeUserStatusPermission])
+@make_logged
 def user_activate(request, user):
     return change_user_active(request, user, True)
 
 @api_view(["POST",])
 @permission_classes([ChangeUserStatusPermission])
+@make_logged
 def user_deactivate(request, user):
     return change_user_active(request, user, False)

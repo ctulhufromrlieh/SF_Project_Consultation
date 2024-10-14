@@ -13,19 +13,20 @@ from main.models import Slot, SlotStatusActionType, ReasonType, SlotAction
 from main.utils import is_datetimes_intersect
 from .serializers import ForClientUserSerializer, ForClientSlotSerializer, ForClientSlotActionSerializer, UnsignSlotActionSerializer
 from .permissions import *
+from main.views import *
 
 # Create your views here.
-class SpecialistListView(ListAPIView):
+class SpecialistListView(LoggedListModelMixin, ListAPIView):
     queryset = User.objects.filter(groups__name='specialists')
     serializer_class = ForClientUserSerializer
     permission_classes = [ViewSpecPermission]
 
-class SpecialistView(RetrieveAPIView):
+class SpecialistView(LoggedRetrieveModelMixin, RetrieveAPIView):
     queryset = User.objects.filter(groups__name='specialists')
     serializer_class = ForClientUserSerializer
     permission_classes = [ViewSpecPermission]
 
-class SlotListView(ListAPIView):
+class SlotListView(LoggedListModelMixin, ListAPIView):
     serializer_class = ForClientSlotSerializer
     permission_classes = [ViewSlotPermission]
 
@@ -36,7 +37,7 @@ class SlotListView(ListAPIView):
         
         return Slot.objects.all().exclude(is_deleted=True).filter(Q(client=None) | Q(client=user))
     
-class SlotOneView(RetrieveAPIView):
+class SlotOneView(LoggedRetrieveModelMixin, RetrieveAPIView):
     serializer_class = ForClientSlotSerializer
     permission_classes = [ViewSlotPermission]
 
@@ -47,7 +48,7 @@ class SlotOneView(RetrieveAPIView):
         
         return Slot.objects.all().exclude(is_deleted=True).filter(Q(client=None) | Q(client=user))
     
-class SlotActionListView(ListAPIView):
+class SlotActionListView(LoggedListModelMixin, ListAPIView):
     serializer_class = ForClientSlotActionSerializer
     permission_classes = [ViewSlotActionPermission]
 
@@ -57,7 +58,7 @@ class SlotActionListView(ListAPIView):
         except:
             return SlotAction.objects.none()
     
-class SlotActionOneView(RetrieveAPIView):
+class SlotActionOneView(LoggedRetrieveModelMixin, RetrieveAPIView):
     serializer_class = ForClientSlotActionSerializer
     permission_classes = [ViewSlotActionPermission]
 
@@ -69,6 +70,7 @@ class SlotActionOneView(RetrieveAPIView):
 
 @api_view(["POST",])
 @permission_classes([SignSlotActionPermission])
+@make_logged
 def sign_to_slot(request, slot=-1):
     if request.method == "POST":
         user = request.user
@@ -125,6 +127,7 @@ def sign_to_slot(request, slot=-1):
 @swagger_auto_schema(method='POST', request_body=UnsignSlotActionSerializer)
 @api_view(["POST",])
 @permission_classes([UnsignSlotActionPermission])
+@make_logged
 def unsign_from_slot(request, slot):
     if request.method == "POST":
         user = request.user

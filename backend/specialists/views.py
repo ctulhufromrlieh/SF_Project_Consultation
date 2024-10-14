@@ -7,10 +7,11 @@ from rest_framework.response import Response
 from main.models import Slot, SlotAction, SlotStatusActionType
 from .permissions import *
 from .serializers import SlotSerializerRead, SlotSerializerWrite, ForSpecialistSlotActionSerializer
+from main.views import *
 
 # Create your views here.
 
-class SlotListView(ListCreateAPIView):
+class SlotListView(LoggedListModelMixin, LoggedCreateModelMixin, ListCreateAPIView):
     permission_classes = [SlotListViewPermission]
 
     def get_queryset(self):
@@ -37,7 +38,7 @@ class SlotListView(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(specialist=self.request.user)
 
-class SlotOneView(RetrieveUpdateDestroyAPIView):
+class SlotOneView(LoggedRetrieveModelMixin, LoggedUpdateModelMixin, LoggedDestroyModelMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = SlotSerializerWrite
     permission_classes = [SlotOneViewPermission]
 
@@ -77,7 +78,7 @@ class SlotOneView(RetrieveUpdateDestroyAPIView):
         instance.is_deleted = True
         instance.save()
     
-class SlotActionListView(ListAPIView):
+class SlotActionListView(LoggedListModelMixin, ListAPIView):
     serializer_class = ForSpecialistSlotActionSerializer
     permission_classes = [ViewSlotActionPermission]
 
@@ -87,7 +88,7 @@ class SlotActionListView(ListAPIView):
         except:
             return SlotAction.objects.none()
     
-class SlotActionOneView(RetrieveAPIView):
+class SlotActionOneView(LoggedRetrieveModelMixin, RetrieveAPIView):
     serializer_class = ForSpecialistSlotActionSerializer
     permission_classes = [ViewSlotActionPermission]
 
@@ -99,6 +100,7 @@ class SlotActionOneView(RetrieveAPIView):
 
 @api_view(["POST",])
 @permission_classes([AcceptSlotActionPermission])
+@make_logged
 def accept_slot(request, slot=-1):
     if request.method == "POST":
         user = request.user
@@ -147,6 +149,7 @@ def accept_slot(request, slot=-1):
 
 @api_view(["POST",])
 @permission_classes([DeclineSlotActionPermission])
+@make_logged
 def decline_slot(request, slot=-1):
     if request.method == "POST":
         user = request.user
