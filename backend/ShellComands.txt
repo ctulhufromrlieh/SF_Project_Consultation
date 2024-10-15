@@ -1,0 +1,2 @@
+from main.tests_common import *
+create_example_database_1()
