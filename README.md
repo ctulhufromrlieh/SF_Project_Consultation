@@ -38,7 +38,7 @@ admin
 password: admin
 
 ## Swagger  
-OpenAPI scheme can be found on:  
+Swagger scheme can be found on:  
 http://localhost:8000/swagger  
 
 ## Superadmin  
